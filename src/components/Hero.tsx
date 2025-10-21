@@ -2,8 +2,10 @@
 
 import { motion } from "framer-motion";
 import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Hero() {
+  const router = useRouter();
   // Variants for animations
   useEffect(() => {
     // Cleanup for any async effects
@@ -127,19 +129,24 @@ export default function Hero() {
             className="flex flex-col sm:flex-row gap-4 justify-center mb-16"
           >
             <motion.button
+              onClick={() => router.push("/dashboard")}
               whileHover={{
                 scale: 1.05,
                 boxShadow: "0 0 30px rgba(34, 211, 238, 0.5)",
               }}
               whileTap={{ scale: 0.95 }}
-              className="px-8 py-4 bg-gradient-to-r from-cyan-500 to-teal-500 text-slate-950 font-bold rounded-lg hover:shadow-lg transition-shadow"
+              className="px-8 py-4 bg-gradient-to-r from-cyan-500 to-teal-500 text-slate-950 font-bold rounded-lg hover:shadow-lg transition-shadow cursor-pointer"
             >
               Explore Dashboard
             </motion.button>
             <motion.button
+              onClick={() => {
+                const element = document.getElementById("features");
+                element?.scrollIntoView({ behavior: "smooth" });
+              }}
               whileHover={{ scale: 1.05, borderColor: "rgba(34, 211, 238, 1)" }}
               whileTap={{ scale: 0.95 }}
-              className="px-8 py-4 border-2 border-cyan-500/50 text-cyan-300 font-bold rounded-lg hover:border-cyan-500 transition-colors backdrop-blur-sm"
+              className="px-8 py-4 border-2 border-cyan-500/50 text-cyan-300 font-bold rounded-lg hover:border-cyan-500 transition-colors backdrop-blur-sm cursor-pointer"
             >
               Learn More
             </motion.button>
@@ -147,6 +154,7 @@ export default function Hero() {
 
           {/* Feature Cards */}
           <motion.div
+            id="features"
             variants={containerVariants}
             className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12"
           >
