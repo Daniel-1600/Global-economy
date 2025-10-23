@@ -12,33 +12,13 @@ export default function Hero() {
     return () => {};
   }, []);
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.2,
-        delayChildren: 0.3,
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.8 },
-    },
-  };
-
   return (
-    <div className="relative min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 overflow-hidden pt-32">
+    <div className="relative min-h-screen bg-black overflow-hidden pt-32">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
         {/* Orb 1 */}
         <motion.div
-          className="absolute w-96 h-96 bg-cyan-500 rounded-full blur-3xl opacity-20"
+          className="absolute w-96 h-96 bg-blue-600 rounded-full blur-3xl opacity-20"
           style={{
             top: "10%",
             left: "5%",
@@ -55,7 +35,7 @@ export default function Hero() {
         />
         {/* Orb 2 */}
         <motion.div
-          className="absolute w-96 h-96 bg-teal-500 rounded-full blur-3xl opacity-20"
+          className="absolute w-96 h-96 bg-blue-500 rounded-full blur-3xl opacity-15"
           style={{
             bottom: "10%",
             right: "5%",
@@ -78,24 +58,32 @@ export default function Hero() {
       <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-4 sm:px-6 lg:px-8">
         <motion.div
           className="w-full max-w-5xl"
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
+          // variants={containerVariants}
+          // initial="hidden"
+          // animate="visible"
         >
           {/* Badge */}
           <motion.div
-            variants={itemVariants}
+            // variants={itemVariants}
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{
+              duration: 0.5,
+              type: "spring",
+              stiffness: 100,
+              delay: 0.2,
+            }}
             className="flex justify-center mb-8"
           >
             <motion.div
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-cyan-500/10 border border-cyan-500/30 backdrop-blur-sm"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/30 backdrop-blur-sm"
               whileHover={{ scale: 1.05 }}
             >
               <span className="relative flex h-2 w-2">
-                <span className="animate-pulse absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
+                <span className="animate-pulse absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
               </span>
-              <span className="text-sm font-medium text-cyan-300">
+              <span className="text-sm font-medium text-blue-400">
                 Powered by Real Data & AI Insights
               </span>
             </motion.div>
@@ -103,20 +91,36 @@ export default function Hero() {
 
           {/* Main Heading */}
           <motion.h1
-            variants={itemVariants}
-            className="text-4xl sm:text-5xl md:text-7xl font-bold text-center mb-6 bg-gradient-to-r from-cyan-300 via-teal-300 to-blue-400 bg-clip-text text-transparent leading-tight"
+            // variants={itemVariants}
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{
+              duration: 0.5,
+              type: "spring",
+              stiffness: 100,
+              delay: 0.3,
+            }}
+            className="text-4xl sm:text-5xl md:text-7xl font-bold text-center mb-6 text-white leading-tight"
           >
             Global Economy
             <br />
-            <span className="text-3xl sm:text-4xl md:text-6xl">
+            <span className="text-3xl sm:text-4xl md:text-6xl text-blue-500">
               At Your Fingertips
             </span>
           </motion.h1>
 
           {/* Subheading */}
           <motion.p
-            variants={itemVariants}
-            className="text-center text-lg sm:text-xl text-blue-200/70 mb-8 max-w-2xl mx-auto"
+            // variants={itemVariants}
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{
+              duration: 0.5,
+              type: "spring",
+              stiffness: 100,
+              delay: 0.4,
+            }}
+            className="text-center text-lg sm:text-xl text-gray-400 mb-8 max-w-2xl mx-auto"
           >
             Explore, visualize, and analyze world economic data with AI-powered
             insights. Make informed decisions with real-time analytics and
@@ -125,17 +129,25 @@ export default function Hero() {
 
           {/* CTA Buttons */}
           <motion.div
-            variants={itemVariants}
+            // variants={itemVariants}
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{
+              duration: 0.5,
+              type: "spring",
+              stiffness: 100,
+              delay: 0.5,
+            }}
             className="flex flex-col sm:flex-row gap-4 justify-center mb-16"
           >
             <motion.button
               onClick={() => router.push("/dashboard")}
               whileHover={{
                 scale: 1.05,
-                boxShadow: "0 0 30px rgba(34, 211, 238, 0.5)",
+                boxShadow: "0 0 30px rgba(59, 130, 246, 0.5)",
               }}
               whileTap={{ scale: 0.95 }}
-              className="px-8 py-4 bg-gradient-to-r from-cyan-500 to-teal-500 text-slate-950 font-bold rounded-lg hover:shadow-lg transition-shadow cursor-pointer"
+              className="px-8 py-4 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-500 transition-all cursor-pointer"
             >
               Explore Dashboard
             </motion.button>
@@ -144,9 +156,9 @@ export default function Hero() {
                 const element = document.getElementById("features");
                 element?.scrollIntoView({ behavior: "smooth" });
               }}
-              whileHover={{ scale: 1.05, borderColor: "rgba(34, 211, 238, 1)" }}
+              whileHover={{ scale: 1.05, borderColor: "rgba(59, 130, 246, 1)" }}
               whileTap={{ scale: 0.95 }}
-              className="px-8 py-4 border-2 border-cyan-500/50 text-cyan-300 font-bold rounded-lg hover:border-cyan-500 transition-colors backdrop-blur-sm cursor-pointer"
+              className="px-8 py-4 border-2 border-blue-500/50 text-blue-400 font-bold rounded-lg hover:border-blue-500 transition-colors backdrop-blur-sm cursor-pointer"
             >
               Learn More
             </motion.button>
@@ -155,49 +167,210 @@ export default function Hero() {
           {/* Feature Cards */}
           <motion.div
             id="features"
-            variants={containerVariants}
+            // variants={containerVariants}
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{
+              duration: 0.5,
+              type: "spring",
+              stiffness: 100,
+              delay: 0.6,
+            }}
             className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12"
           >
             {[
               {
-                icon: "📊",
+                icon: (
+                  <svg
+                    className="w-16 h-16"
+                    viewBox="0 0 64 64"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <rect
+                      x="8"
+                      y="12"
+                      width="48"
+                      height="44"
+                      rx="4"
+                      fill="#3B82F6"
+                      fillOpacity="0.2"
+                      stroke="#3B82F6"
+                      strokeWidth="2"
+                    />
+                    <rect
+                      x="16"
+                      y="32"
+                      width="8"
+                      height="16"
+                      rx="2"
+                      fill="#3B82F6"
+                    />
+                    <rect
+                      x="28"
+                      y="24"
+                      width="8"
+                      height="24"
+                      rx="2"
+                      fill="#60A5FA"
+                    />
+                    <rect
+                      x="40"
+                      y="16"
+                      width="8"
+                      height="32"
+                      rx="2"
+                      fill="#93C5FD"
+                    />
+                  </svg>
+                ),
                 title: "Real-Time Data",
                 description:
                   "Access live economic indicators and market trends",
               },
               {
-                icon: "🤖",
+                icon: (
+                  <svg
+                    className="w-16 h-16"
+                    viewBox="0 0 64 64"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <circle
+                      cx="32"
+                      cy="28"
+                      r="16"
+                      fill="#3B82F6"
+                      fillOpacity="0.2"
+                      stroke="#3B82F6"
+                      strokeWidth="2"
+                    />
+                    <circle cx="26" cy="26" r="3" fill="#60A5FA" />
+                    <circle cx="38" cy="26" r="3" fill="#60A5FA" />
+                    <path
+                      d="M24 34 Q32 38 40 34"
+                      stroke="#3B82F6"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                    />
+                    <rect
+                      x="22"
+                      y="16"
+                      width="4"
+                      height="6"
+                      rx="2"
+                      fill="#3B82F6"
+                    />
+                    <rect
+                      x="38"
+                      y="16"
+                      width="4"
+                      height="6"
+                      rx="2"
+                      fill="#3B82F6"
+                    />
+                    <path
+                      d="M16 44 L32 52 L48 44"
+                      stroke="#60A5FA"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                ),
                 title: "AI Insights",
                 description:
                   "Get intelligent predictions and analysis powered by ML",
               },
               {
-                icon: "🌍",
+                icon: (
+                  <svg
+                    className="w-16 h-16"
+                    viewBox="0 0 64 64"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <circle
+                      cx="32"
+                      cy="32"
+                      r="20"
+                      fill="#3B82F6"
+                      fillOpacity="0.2"
+                      stroke="#3B82F6"
+                      strokeWidth="2"
+                    />
+                    <ellipse
+                      cx="32"
+                      cy="32"
+                      rx="8"
+                      ry="20"
+                      stroke="#60A5FA"
+                      strokeWidth="1.5"
+                    />
+                    <line
+                      x1="12"
+                      y1="32"
+                      x2="52"
+                      y2="32"
+                      stroke="#60A5FA"
+                      strokeWidth="1.5"
+                    />
+                    <path
+                      d="M20 20 Q32 18 44 20"
+                      stroke="#60A5FA"
+                      strokeWidth="1.5"
+                      fill="none"
+                    />
+                    <path
+                      d="M20 44 Q32 46 44 44"
+                      stroke="#60A5FA"
+                      strokeWidth="1.5"
+                      fill="none"
+                    />
+                    <circle cx="32" cy="32" r="3" fill="#3B82F6" />
+                  </svg>
+                ),
                 title: "Global Coverage",
                 description: "Explore economies from 195+ countries worldwide",
               },
             ].map((feature, idx) => (
               <motion.div
                 key={idx}
-                variants={itemVariants}
-                whileHover={{ y: -10, borderColor: "rgba(34, 211, 238, 0.8)" }}
-                className="p-6 rounded-xl bg-slate-800/50 border border-cyan-500/20 backdrop-blur-sm hover:border-cyan-500/60 transition-all"
+                // variants={itemVariants}
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{
+                  duration: 0.5,
+                  type: "spring",
+                  stiffness: 100,
+                  delay: 0.7,
+                }}
+                whileHover={{ y: -10, borderColor: "rgba(59, 130, 246, 0.8)" }}
+                className="p-6 rounded-xl bg-gray-900/50 border border-blue-500/20 backdrop-blur-sm hover:border-blue-500/60 transition-all text-center"
               >
-                <div className="text-4xl mb-3">{feature.icon}</div>
-                <h3 className="text-lg font-semibold text-cyan-300 mb-2">
+                <div className="mb-4 flex items-center justify-center">
+                  {feature.icon}
+                </div>
+                <h3 className="text-lg font-semibold text-blue-400 mb-2">
                   {feature.title}
                 </h3>
-                <p className="text-sm text-blue-200/60">
-                  {feature.description}
-                </p>
+                <p className="text-sm text-gray-400">{feature.description}</p>
               </motion.div>
             ))}
           </motion.div>
 
           {/* Stats Row */}
           <motion.div
-            variants={containerVariants}
-            className="flex flex-col sm:flex-row justify-around gap-8 pt-8 border-t border-cyan-500/20"
+            // variants={containerVariants}
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{
+              duration: 0.5,
+              type: "spring",
+              stiffness: 100,
+              delay: 0.8,
+            }}
+            className="flex flex-col sm:flex-row justify-around gap-8 pt-8 border-t border-blue-500/30"
           >
             {[
               { value: "195+", label: "Countries" },
@@ -206,11 +379,19 @@ export default function Hero() {
             ].map((stat, idx) => (
               <motion.div
                 key={idx}
-                variants={itemVariants}
+                // variants={itemVariants
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{
+                  duration: 0.5,
+                  type: "spring",
+                  stiffness: 100,
+                  delay: 0.9,
+                }}
                 className="text-center"
               >
                 <motion.div
-                  className="text-3xl font-bold text-cyan-400 mb-2"
+                  className="text-3xl font-bold text-blue-500 mb-2"
                   animate={{ scale: [1, 1.1, 1] }}
                   transition={{
                     duration: 2,
@@ -220,7 +401,7 @@ export default function Hero() {
                 >
                   {stat.value}
                 </motion.div>
-                <div className="text-sm text-blue-200/60">{stat.label}</div>
+                <div className="text-sm text-gray-400">{stat.label}</div>
               </motion.div>
             ))}
           </motion.div>
@@ -232,15 +413,7 @@ export default function Hero() {
         className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-10"
         animate={{ y: [0, 10, 0] }}
         transition={{ duration: 2, repeat: Infinity }}
-      >
-        <div className="w-6 h-10 border-2 border-cyan-500/50 rounded-full flex items-center justify-center">
-          <motion.div
-            className="w-1 h-2 bg-cyan-500 rounded-full"
-            animate={{ y: [0, 6, 0] }}
-            transition={{ duration: 2, repeat: Infinity }}
-          />
-        </div>
-      </motion.div>
+      ></motion.div>
     </div>
   );
 }
