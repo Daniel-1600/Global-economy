@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 export default function Hero() {
   const router = useRouter();
@@ -404,6 +405,128 @@ export default function Hero() {
                 <div className="text-sm text-gray-400">{stat.label}</div>
               </motion.div>
             ))}
+          </motion.div>
+
+          {/* Screenshot Preview Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{
+              duration: 0.8,
+              type: "spring",
+              stiffness: 80,
+              delay: 1.0,
+            }}
+            className="mt-20 mb-16"
+          >
+            <h2 className="text-2xl sm:text-3xl font-bold text-center text-white mb-4">
+              See It In Action
+            </h2>
+            <p className="text-center text-gray-400 mb-8 max-w-2xl mx-auto">
+              Experience our intuitive dashboard with real-time data
+              visualization and AI-powered insights
+            </p>
+
+            {/* Dashboard Preview Screenshot */}
+            <motion.div
+              whileHover={{ scale: 1.02, y: -5 }}
+              transition={{ duration: 0.3 }}
+              className="relative rounded-2xl overflow-hidden border-2 border-blue-500/30 shadow-2xl shadow-blue-500/20"
+            >
+              {/* Browser Chrome */}
+              <div className="bg-gray-800/95 backdrop-blur-sm px-4 py-3 flex items-center gap-2 border-b border-gray-700">
+                <div className="flex gap-2">
+                  <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                  <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                  <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                </div>
+                <div className="flex-1 mx-4 bg-gray-700/80 rounded px-3 py-1 text-xs text-gray-400">
+                  www.countrydata.com
+                </div>
+              </div>
+
+              {/* Actual Screenshot Image */}
+              <div className="relative bg-black overflow-hidden">
+                <Image
+                  src="/dashboard.png"
+                  alt="Economy Explorer Dashboard"
+                  width={1920}
+                  height={1080}
+                  className="w-full h-auto"
+                  onError={(e) => {
+                    // Fallback if image doesn't load
+                    const target = e.target as HTMLImageElement;
+                    target.style.display = "none";
+                    const parent = target.parentElement;
+                    if (parent) {
+                      parent.innerHTML = `
+                        <div class="flex items-center justify-center h-96 bg-gradient-to-br from-gray-900 to-black">
+                          <div class="text-center">
+                            <div class="text-6xl mb-4">📊</div>
+                            <p class="text-gray-400 text-lg">Dashboard Preview</p>
+                            <p class="text-blue-400/60 text-sm mt-2">Save your dashboard screenshot as dashboard.png in the public folder</p>
+                          </div>
+                        </div>
+                      `;
+                    }
+                  }}
+                />
+
+                {/* Animated ping effect on screenshot */}
+                <motion.div
+                  className="absolute top-1/4 left-1/4 w-4 h-4"
+                  animate={{
+                    scale: [1, 1.5, 1],
+                    opacity: [0.5, 0, 0.5],
+                  }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
+                >
+                  <div className="w-full h-full bg-blue-500 rounded-full"></div>
+                </motion.div>
+              </div>
+
+              {/* Glow Effect */}
+              <div className="absolute inset-0 bg-gradient-to-t from-blue-500/10 via-transparent to-transparent pointer-events-none"></div>
+            </motion.div>
+
+            {/* Feature Highlights Below Screenshot */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+              <motion.div whileHover={{ y: -5 }} className="text-center">
+                <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-blue-500/20 border border-blue-500/30 mb-3">
+                  <span className="text-2xl">⚡</span>
+                </div>
+                <h4 className="text-white font-semibold mb-1">
+                  Lightning Fast
+                </h4>
+                <p className="text-sm text-gray-400">
+                  Real-time data updates and instant visualizations
+                </p>
+              </motion.div>
+
+              <motion.div whileHover={{ y: -5 }} className="text-center">
+                <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-blue-500/20 border border-blue-500/30 mb-3">
+                  <span className="text-2xl">🎨</span>
+                </div>
+                <h4 className="text-white font-semibold mb-1">Beautiful UI</h4>
+                <p className="text-sm text-gray-400">
+                  Modern design with smooth animations
+                </p>
+              </motion.div>
+
+              <motion.div whileHover={{ y: -5 }} className="text-center">
+                <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-blue-500/20 border border-blue-500/30 mb-3">
+                  <span className="text-2xl">🔒</span>
+                </div>
+                <h4 className="text-white font-semibold mb-1">Reliable Data</h4>
+                <p className="text-sm text-gray-400">
+                  Powered by trusted World Bank APIs
+                </p>
+              </motion.div>
+            </div>
           </motion.div>
         </motion.div>
       </div>
