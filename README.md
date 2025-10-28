@@ -1,40 +1,81 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).
 
-## Getting Started
+# Global Economy (Economy Explorer)
 
-First, run the development server:
+Real-time global economic data and AI-powered insights — an interactive web dashboard that fetches World Bank GDP data, stores it, and visualizes country and continent-level summaries.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Features
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- Real-time World Bank data ingestion
+  - Backend endpoint to fetch and persist World Bank GDP data (POST /api/economy/store).
+  - Cleans and normalizes World Bank responses (filters nulls, parses years, rounds values).
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+- REST API
+  - Public endpoint to retrieve structured economy data (GET /api/economy), supports region filtering (e.g., `?region=asia`).
+  - API returns metadata (source, indicator, lastUpdated) and structured records ready for the frontend.
 
-[API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+- Data storage & analytics
+  - Persists country GDP records to a PostgreSQL database using a DB pool.
+  - Calculates continent summaries (total GDP, average GDP, country counts, top country) for the latest year.
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) instead of React pages.
+- Interactive Dashboard (Frontend)
+  - Region selector (Global, Asia, Europe, Americas, Africa, Oceania), country search, and a countries data table.
+  - Key metric cards (Top GDP, Total Countries, Latest Year, Data Points) and Top Economies list.
+  - AI Insights panel providing high-level trend observations.
+  - Smooth animations and responsive UI.
 
-This project uses [`next/font`](https://nextjs.org/docs/pages/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- UX / UI
+  - Built with Tailwind CSS and Framer Motion for animations.
+  - Sidebar, hero, footer, and subscription CTA with social links.
 
-## Learn More
+## Tech stack
 
-To learn more about Next.js, take a look at the following resources:
+- Frontend: React + TypeScript (.tsx), Tailwind CSS, Framer Motion
+- Backend: Express.js, Axios
+- Data: World Bank API, PostgreSQL
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn-pages-router) - an interactive Next.js tutorial.
+## Quick start (inferred)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. Clone the repo:
+   git clone https://github.com/Daniel-1600/Global-economy.git
 
-## Deploy on Vercel
+2. Install dependencies:
+   - Root or client:
+     npm install
+   - Server (if separated under SERVER/):
+     cd SERVER
+     npm install
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+3. Configure environment:
+   - Create a .env (or configure environment vars) for PostgreSQL connection string and any other server envs. The server code references a DB pool in SERVER/config/db.js — set DATABASE_URL or the variables used there.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploying) for more details.
+4. Run the server:
+   - Example (adjust to your scripts):
+     cd SERVER
+     npm run dev   # or npm start
+
+5. Run the frontend:
+   - In project root:
+     npm run dev   # or the specific script for the frontend
+
+6. Open the app:
+   - Visit http://localhost:3000 (or the port your frontend uses) and navigate to /dashboard to view the Economy Dashboard.
+
+## API notes (inferred)
+
+- POST /api/economy/store
+  - Fetches data from the World Bank API and stores cleaned records in the database.
+
+- GET /api/economy
+  - Returns structured data and metadata. Supports query param `region` (e.g., `?region=asia`) to filter by continent/region.
+
+- GET /api/economy?table=<table>&limit=<n>
+  - Backend includes routes for fetching stored results from DB tables (e.g., gdp table, continent_summaries) with ordering and limits.
+
+## Development notes
+
+- Frontend fetches API at `http://localhost:5000/api/economy` in the dashboard code; ensure the server runs on port 5000 or update the frontend fetch URL.
+- The app infers continent groupings and computes continent summaries for the latest year in the dataset.
+- Some placeholder UI elements (AI insights text, hero CTA, subscription form) are present and may be wired to backend/email services in the future.
+
+
+
