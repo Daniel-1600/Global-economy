@@ -1,11 +1,26 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  // Listen for scroll events
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 50) {
+        setScrolled(true);
+      } else {
+        setScrolled(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const navItems = [
     { name: "Dashboard", href: "/dashboard" },
@@ -48,7 +63,11 @@ export default function Navbar() {
 
   return (
     <motion.nav
-      className="fixed top-0 w-full z-50 bg-black/90 backdrop-blur-md border-b border-blue-500/10"
+      className={`fixed top-0 w-full z-50 transition-all duration-300 ${
+        scrolled
+          ? "bg-black/60 backdrop-blur-xl border-b border-blue-500/30 shadow-lg shadow-blue-500/10"
+          : "bg-black/90 backdrop-blur-md border-b border-blue-500/10"
+      }`}
       initial={{ opacity: 0, y: -100 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}

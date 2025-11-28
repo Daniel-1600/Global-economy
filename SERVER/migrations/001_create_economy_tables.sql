@@ -1,3 +1,4 @@
+
 -- ============================================
 -- Economy Data Storage Schema
 -- File: 001_create_economy_tables.sql
