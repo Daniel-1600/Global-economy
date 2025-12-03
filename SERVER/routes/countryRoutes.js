@@ -21,6 +21,7 @@ router.post("/collect", async (req, res) => {
     }
 
     res.json(data);
+    console.log(data);
   } catch (error) {
     console.error("Error in /collect route:", error.message);
     res.status(500).json({ error: "Failed to fetch country data" });

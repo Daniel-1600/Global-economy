@@ -45,7 +45,7 @@ export const fetchCountrydata = async (countryCode) => {
 
     return { gdpData, popData };
   } catch (error) {
-    console.error("Failed to fetch country data:", error.message);
+    console.error("Failed to fetch country data:", error.message, error.code);
     throw error;
   }
 };

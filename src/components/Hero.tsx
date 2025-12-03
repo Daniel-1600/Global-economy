@@ -148,7 +148,7 @@ export default function Hero() {
                 boxShadow: "0 0 30px rgba(59, 130, 246, 0.5)",
               }}
               whileTap={{ scale: 0.95 }}
-              className="px-8 py-4 bg-white text-black font-bold rounded-lg hover:bg-gray-100 transition-all cursor-pointer flex items-center justify-center gap-2"
+              className="px-8 py-4 bg-blue-500 text-white font-bold rounded-lg transition-all cursor-pointer flex items-center justify-center gap-2"
             >
               Start Your Free Trial
               <svg

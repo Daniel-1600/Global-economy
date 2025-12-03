@@ -312,7 +312,7 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a1a] flex">
+    <div className="min-h-screen bg-[#0a0a1a] flex mb-3`">
       {/* Sidebar */}
       <motion.aside
         initial={{ x: -280 }}
@@ -352,17 +352,16 @@ export default function Dashboard() {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 px-4 py-2 overflow-y-auto">
+        <nav className="flex-1 px-4 py-5 overflow-y-auto">
           <div className="space-y-2">
             {menuItems.map((item) => {
               const isActive = router.pathname === item.path;
               return (
                 <Link key={item.path} href={item.path}>
                   <motion.div
-                    whileHover={{ x: 4 }}
-                    className={`flex items-center gap-3 ml-2 px-4 py-3 rounded-xl transition-all cursor-pointer ${
+                    className={`flex items-center gap-3 ml-2 px-4 py-3 mb-3 rounded-xl transition-all cursor-pointer ${
                       isActive
-                        ? "bg-blue-500/20 text-blue-400 shadow-lg shadow-blue-500/10"
+                        ? "bg-blue-500/20 text-blue-400 "
                         : "text-gray-400 hover:text-white hover:bg-gray-800/50"
                     }`}
                   >
@@ -437,7 +436,7 @@ export default function Dashboard() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.1 }}
-                whileHover={{ y: -4, borderColor: "rgba(59, 130, 246, 0.4)" }}
+                whileHover={{ borderColor: "rgba(59, 130, 246, 0.4)" }}
                 className="bg-[#12121f] border border-gray-800/50 rounded-2xl p-5 transition-all"
               >
                 <div className="flex items-center justify-between mb-4">
