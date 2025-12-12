@@ -4,12 +4,16 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { useSession, signOut } from "next-auth/react";
 
 export default function Dashboard() {
   const router = useRouter();
+  const { data: session, status } = useSession();
   const [economyData, setEconomyData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [userName] = useState("Explorer");
+
+  // Get user name from session or default to "Explorer"
+  const userName = session?.user?.name || "Explorer";
 
   // Sidebar menu items
   const menuItems = [
@@ -381,14 +385,51 @@ export default function Dashboard() {
         {/* User Profile */}
         <div className="p-4 border-t border-gray-800/50">
           <div className="flex items-center gap-3 px-3 py-2">
-            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-              <span className="text-white font-medium text-sm">U</span>
-            </div>
+            {session?.user?.image ? (
+              <img
+                src={session.user.image}
+                alt={userName}
+                className="w-9 h-9 rounded-full object-cover"
+              />
+            ) : (
+              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                <span className="text-white font-medium text-sm">
+                  {userName.charAt(0).toUpperCase()}
+                </span>
+              </div>
+            )}
             <div className="flex-1">
-              <p className="text-sm font-medium text-white">User</p>
-              <p className="text-xs text-gray-500">Free Plan</p>
+              <p className="text-sm font-medium text-white">{userName}</p>
+              <p className="text-xs text-gray-500">
+                {session ? "Signed In" : "Guest"}
+              </p>
             </div>
+            {session && (
+              <button
+                onClick={() => signOut({ callbackUrl: "/" })}
+                className="text-gray-400 hover:text-red-400 transition-colors"
+                title="Sign out"
+              >
+                <svg
+                  className="w-4 h-4"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
+                  <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" />
+                </svg>
+              </button>
+            )}
           </div>
+          {!session && (
+            <Link
+              href="/login"
+              className="mt-2 block text-center text-sm text-blue-400 hover:text-blue-300 transition-colors"
+            >
+              Sign in to save your data
+            </Link>
+          )}
         </div>
       </motion.aside>
 
@@ -398,12 +439,15 @@ export default function Dashboard() {
         <header className="sticky top-0 z-40 bg-[#0a0a1a]/90 backdrop-blur-xl border-b border-gray-800/50">
           <div className="flex items-center justify-between px-6 py-4">
             <h1 className="text-xl font-semibold text-white">
-              Welcome back, <span className="text-blue-400">Explorer</span>
+              Welcome back, <span className="text-blue-400">{userName}</span>
             </h1>
 
             {/* Right side actions */}
             <div className="flex items-center gap-3">
-              <button className="text-gray-400 hover:text-white transition-colors flex items-center gap-2 text-sm">
+              <Link
+                href="/"
+                className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 text-sm"
+              >
                 <svg
                   className="w-4 h-4"
                   viewBox="0 0 24 24"
@@ -411,17 +455,11 @@ export default function Dashboard() {
                   stroke="currentColor"
                   strokeWidth="2"
                 >
-                  <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" />
+                  <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                  <polyline points="9,22 9,12 15,12 15,22" />
                 </svg>
-                Export data
-              </button>
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors"
-              >
-                Generate Report
-              </motion.button>
+                Return to Home
+              </Link>
             </div>
           </div>
         </header>
