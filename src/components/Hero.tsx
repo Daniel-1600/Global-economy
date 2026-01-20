@@ -150,7 +150,7 @@ export default function Hero() {
               whileTap={{ scale: 0.95 }}
               className="px-8 py-4 bg-blue-500 text-white font-bold rounded-lg transition-all cursor-pointer flex items-center justify-center gap-2"
             >
-              Start Your Free Trial
+              Go to dashboard
               <svg
                 className="w-5 h-5"
                 viewBox="0 0 24 24"
@@ -159,26 +159,6 @@ export default function Hero() {
                 strokeWidth="2"
               >
                 <path d="M5 12h14M12 5l7 7-7 7" />
-              </svg>
-            </motion.button>
-            <motion.button
-              onClick={() => {
-                const element = document.getElementById("features");
-                element?.scrollIntoView({ behavior: "smooth" });
-              }}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="px-8 py-4 text-white font-bold rounded-lg hover:bg-white/10 transition-colors backdrop-blur-sm cursor-pointer flex items-center justify-center gap-2"
-            >
-              See How It Works
-              <svg
-                className="w-5 h-5"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <path d="M12 5v14M5 12l7 7 7-7" />
               </svg>
             </motion.button>
           </motion.div>
@@ -285,6 +265,170 @@ export default function Hero() {
             </div>
           </motion.div>
 
+          {/* How It Works Section */}
+          <motion.div
+            id="how-it-works"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{
+              duration: 0.5,
+              type: "spring",
+              stiffness: 100,
+              delay: 0.7,
+            }}
+            className="mt-32 mb-24"
+          >
+            <div className="text-center mb-16">
+              <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
+                How It <span className="text-blue-500">Works</span>
+              </h2>
+              <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+                Get started with Economy Explorer in three simple steps
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+              {/* Step 1 */}
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{
+                  duration: 0.5,
+                  type: "spring",
+                  stiffness: 100,
+                  delay: 0.8,
+                }}
+                className="relative"
+              >
+                <div className="bg-gradient-to-br from-gray-900 to-gray-800 border border-blue-500/20 rounded-2xl p-8 hover:border-blue-500/50 transition-all">
+                  <div className="w-16 h-16 bg-blue-500/20 rounded-full flex items-center justify-center mb-6">
+                    <span className="text-3xl font-bold text-blue-500">1</span>
+                  </div>
+                  <h3 className="text-xl font-semibold text-white mb-4">
+                    Sign Up & Explore
+                  </h3>
+                  <p className="text-gray-400">
+                    Create your free account and gain instant access to our
+                    comprehensive economic database covering 195+ countries.
+                  </p>
+                </div>
+              </motion.div>
+
+              {/* Step 2 */}
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{
+                  duration: 0.5,
+                  type: "spring",
+                  stiffness: 100,
+                  delay: 0.9,
+                }}
+                className="relative"
+              >
+                <div className="bg-gradient-to-br from-gray-900 to-gray-800 border border-blue-500/20 rounded-2xl p-8 hover:border-blue-500/50 transition-all">
+                  <div className="w-16 h-16 bg-blue-500/20 rounded-full flex items-center justify-center mb-6">
+                    <span className="text-3xl font-bold text-blue-500">2</span>
+                  </div>
+                  <h3 className="text-xl font-semibold text-white mb-4">
+                    Visualize Data
+                  </h3>
+                  <p className="text-gray-400">
+                    Use our interactive dashboards and charts to visualize
+                    economic trends, GDP growth, and market indicators in
+                    real-time.
+                  </p>
+                </div>
+              </motion.div>
+
+              {/* Step 3 */}
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{
+                  duration: 0.5,
+                  type: "spring",
+                  stiffness: 100,
+                  delay: 1.0,
+                }}
+                className="relative"
+              >
+                <div className="bg-gradient-to-br from-gray-900 to-gray-800 border border-blue-500/20 rounded-2xl p-8 hover:border-blue-500/50 transition-all">
+                  <div className="w-16 h-16 bg-blue-500/20 rounded-full flex items-center justify-center mb-6">
+                    <span className="text-3xl font-bold text-blue-500">3</span>
+                  </div>
+                  <h3 className="text-xl font-semibold text-white mb-4">
+                    Get AI Insights
+                  </h3>
+                  <p className="text-gray-400">
+                    Leverage our AI-powered analysis to get predictive insights,
+                    trend forecasts, and data-driven recommendations.
+                  </p>
+                </div>
+              </motion.div>
+            </div>
+
+            {/* Additional Features */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{
+                duration: 0.5,
+                type: "spring",
+                stiffness: 100,
+                delay: 1.1,
+              }}
+              className="grid grid-cols-1 md:grid-cols-2 gap-6"
+            >
+              <div className="bg-gray-900/50 border border-blue-500/10 rounded-xl p-6 flex items-start gap-4">
+                <div className="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <svg
+                    className="w-6 h-6 text-blue-500"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
+                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                  </svg>
+                </div>
+                <div>
+                  <h4 className="text-white font-semibold mb-2">
+                    Real-Time Updates
+                  </h4>
+                  <p className="text-gray-400 text-sm">
+                    Our system continuously fetches and processes the latest
+                    economic data to keep you informed.
+                  </p>
+                </div>
+              </div>
+
+              <div className="bg-gray-900/50 border border-blue-500/10 rounded-xl p-6 flex items-start gap-4">
+                <div className="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <svg
+                    className="w-6 h-6 text-blue-500"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
+                    <rect x="3" y="3" width="18" height="18" rx="2" />
+                    <path d="M9 3v18M3 9h18M3 15h18M15 3v18" />
+                  </svg>
+                </div>
+                <div>
+                  <h4 className="text-white font-semibold mb-2">
+                    Custom Analytics
+                  </h4>
+                  <p className="text-gray-400 text-sm">
+                    Create custom reports and export data for your specific
+                    analysis needs.
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+
           {/* Feature Cards */}
           <motion.div
             id="features"
@@ -297,7 +441,7 @@ export default function Hero() {
               stiffness: 100,
               delay: 0.6,
             }}
-            className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12"
+            className="mt-24 grid grid-cols-1 md:grid-cols-3 gap-6 mb-12"
           >
             {[
               {

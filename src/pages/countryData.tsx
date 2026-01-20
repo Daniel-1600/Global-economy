@@ -10,13 +10,16 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend,
+  Legend as RechartsLegend,
   ResponsiveContainer,
 } from "recharts";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import Footer from "@/components/footer";
 import Sidebar from "@/components/Sidebar";
+
+// Workaround for recharts Legend component type compatibility with React 18
+const Legend = RechartsLegend as unknown as React.ComponentType;
 
 const Countrydata = () => {
   const [countryCode, setCountryCode] = useState("");
@@ -166,7 +169,7 @@ const Countrydata = () => {
                         <YAxis
                           stroke="#6b7280"
                           style={{ fontSize: "12px" }}
-                          tickFormatter={(value) =>
+                          tickFormatter={(value: number) =>
                             `$${(value / 1000000000000).toFixed(1)}T`
                           }
                         />
@@ -232,7 +235,7 @@ const Countrydata = () => {
                         <YAxis
                           stroke="#6b7280"
                           style={{ fontSize: "12px" }}
-                          tickFormatter={(value) =>
+                          tickFormatter={(value: number) =>
                             `${(value / 1000000).toFixed(0)}M`
                           }
                         />

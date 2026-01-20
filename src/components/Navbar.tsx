@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import router from "next/router";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -24,10 +25,8 @@ export default function Navbar() {
 
   const navItems = [
     { name: "Dashboard", href: "/dashboard" },
-    { name: "Analytics", href: "/analytics" },
-    { name: "Countries", href: "/countries" },
-    { name: "Insights", href: "/insights" },
-    { name: "Docs", href: "/docs" },
+    { name: "How it Works", href: "/#how-it-works" },
+    { name: "Features", href: "/#features" },
   ];
 
   const menuVariants = {
@@ -122,13 +121,7 @@ export default function Navbar() {
           {/* Right Side Actions */}
           <div className="hidden md:flex items-center gap-3">
             <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="px-4 py-2 text-sm font-medium text-gray-300 border border-blue-500/50 rounded-lg hover:border-blue-500 hover:bg-blue-500/10 transition-all"
-            >
-              Sign In
-            </motion.button>
-            <motion.button
+              onClick={() => router.push("/dashboard")}
               whileHover={{
                 scale: 1.05,
                 boxShadow: "0 0 20px rgba(59, 130, 246, 0.5)",
@@ -186,13 +179,6 @@ export default function Navbar() {
               </motion.div>
             ))}
             <div className="flex flex-col gap-2 pt-4 border-t border-blue-500/10">
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className="w-full px-4 py-3 text-sm font-medium text-gray-300 border border-blue-500/50 rounded-lg hover:border-blue-500 hover:bg-blue-500/10 transition-all"
-              >
-                Sign In
-              </motion.button>
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}

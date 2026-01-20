@@ -3,14 +3,32 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/router";
 import { useSession, signOut } from "next-auth/react";
 
+// Type definitions for economy data
+interface Country {
+  name: string;
+}
+
+interface EconomyDataItem {
+  year: number;
+  countryCode: string;
+  gdp: number;
+  country: Country;
+}
+
+interface EconomyDataResponse {
+  success: boolean;
+  count: number;
+  data: EconomyDataItem[];
+}
+
 export default function Dashboard() {
   const router = useRouter();
-  const { data: session, status } = useSession();
-  const [economyData, setEconomyData] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const { data: session } = useSession();
+  const [economyData, setEconomyData] = useState<EconomyDataResponse | null>(null);
 
   // Get user name from session or default to "Explorer"
   const userName = session?.user?.name || "Explorer";
@@ -179,7 +197,6 @@ export default function Dashboard() {
 
   const fetchEconomyData = async () => {
     try {
-      setLoading(true);
       const response = await fetch("http://localhost:5000/api/economy");
       const result = await response.json();
 
@@ -187,32 +204,32 @@ export default function Dashboard() {
         setEconomyData(result);
 
         const latestYear = Math.max(
-          ...result.data.map((item: any) => item.year)
+          ...result.data.map((item: EconomyDataItem) => item.year)
         );
         const uniqueCountries = new Set(
-          result.data.map((item: any) => item.countryCode)
+          result.data.map((item: EconomyDataItem) => item.countryCode)
         ).size;
         const latestData = result.data.filter(
-          (item: any) => item.year === latestYear
+          (item: EconomyDataItem) => item.year === latestYear
         );
 
         // Calculate growth
         const previousYearData = result.data.filter(
-          (item: any) => item.year === latestYear - 1
+          (item: EconomyDataItem) => item.year === latestYear - 1
         );
         const avgGrowth =
           latestData.length > 0 && previousYearData.length > 0
             ? (
                 ((latestData.reduce(
-                  (sum: number, item: any) => sum + item.gdp,
+                  (sum: number, item: EconomyDataItem) => sum + item.gdp,
                   0
                 ) -
                   previousYearData.reduce(
-                    (sum: number, item: any) => sum + item.gdp,
+                    (sum: number, item: EconomyDataItem) => sum + item.gdp,
                     0
                   )) /
                   previousYearData.reduce(
-                    (sum: number, item: any) => sum + item.gdp,
+                    (sum: number, item: EconomyDataItem) => sum + item.gdp,
                     0
                   )) *
                 100
@@ -252,8 +269,6 @@ export default function Dashboard() {
       }
     } catch (error) {
       console.error("Error fetching economy data:", error);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -386,10 +401,12 @@ export default function Dashboard() {
         <div className="p-4 border-t border-gray-800/50">
           <div className="flex items-center gap-3 px-3 py-2">
             {session?.user?.image ? (
-              <img
+              <Image
                 src={session.user.image}
                 alt={userName}
-                className="w-9 h-9 rounded-full object-cover"
+                width={36}
+                height={36}
+                className="rounded-full object-cover"
               />
             ) : (
               <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
@@ -482,7 +499,10 @@ export default function Dashboard() {
                     <span className="text-blue-400">{getIcon(stat.icon)}</span>
                     <span className="text-sm">{stat.label}</span>
                   </div>
-                  <button className="text-gray-500 hover:text-gray-300">
+                  <button
+                    title="More options"
+                    className="text-gray-500 hover:text-gray-300"
+                  >
                     <svg
                       className="w-5 h-5"
                       viewBox="0 0 24 24"
@@ -717,20 +737,20 @@ export default function Dashboard() {
                     ];
 
                     const latestYear = economyData?.data
-                      ? Math.max(...economyData.data.map((d: any) => d.year))
+                      ? Math.max(...economyData.data.map((d: EconomyDataItem) => d.year))
                       : null;
 
                     return economyData?.data
                       ?.filter(
-                        (item: any) =>
+                        (item: EconomyDataItem) =>
                           item.year === latestYear &&
                           item.countryCode &&
                           item.countryCode.length === 3 &&
                           !excludedCodes.includes(item.countryCode)
                       )
-                      ?.sort((a: any, b: any) => b.gdp - a.gdp)
+                      ?.sort((a: EconomyDataItem, b: EconomyDataItem) => b.gdp - a.gdp)
                       ?.slice(0, 5)
-                      ?.map((item: any, idx: number) => (
+                      ?.map((item: EconomyDataItem, idx: number) => (
                         <motion.tr
                           key={idx}
                           initial={{ opacity: 0, x: -20 }}
