@@ -37,7 +37,7 @@ const Countrydata = () => {
     setCountryData(null);
 
     try {
-      const response = await fetch("http://localhost:5000/api/collect", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/collect`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

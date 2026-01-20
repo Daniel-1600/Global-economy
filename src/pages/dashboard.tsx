@@ -197,7 +197,7 @@ export default function Dashboard() {
 
   const fetchEconomyData = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/economy");
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/economy`);
       const result = await response.json();
 
       if (result.success) {
