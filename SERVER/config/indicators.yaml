@@ -1,0 +1,245 @@
+continents:
+  africa:
+    name: Africa
+    countries:
+      - DZA
+      - AGO
+      - BEN
+      - BWA
+      - BFA
+      - BDI
+      - CMR
+      - CPV
+      - CAF
+      - TCD
+      - COM
+      - COG
+      - COD
+      - CIV
+      - DJI
+      - EGY
+      - GNQ
+      - ERI
+      - ETH
+      - GAB
+      - GMB
+      - GHA
+      - GIN
+      - GNB
+      - KEN
+      - LSO
+      - LBR
+      - LBY
+      - MDG
+      - MWI
+      - MLI
+      - MRT
+      - MUS
+      - MAR
+      - MOZ
+      - NAM
+      - NER
+      - NGA
+      - RWA
+      - STP
+      - SEN
+      - SYC
+      - SLE
+      - SOM
+      - ZAF
+      - SSD
+      - SDN
+      - SWZ
+      - TZA
+      - TGO
+      - TUN
+      - UGA
+      - ZMB
+      - ZWE
+
+  asia:
+    name: Asia
+    countries:
+      - AFG
+      - ARM
+      - AZE
+      - BHR
+      - BGD
+      - BTN
+      - BRN
+      - KHM
+      - CHN
+      - GEO
+      - HKG
+      - IND
+      - IDN
+      - IRN
+      - IRQ
+      - ISR
+      - JPN
+      - JOR
+      - KAZ
+      - KWT
+      - KGZ
+      - LAO
+      - LBN
+      - MAC
+      - MYS
+      - MDV
+      - MNG
+      - MMR
+      - NPL
+      - PRK
+      - OMN
+      - PAK
+      - PSE
+      - PHL
+      - QAT
+      - SAU
+      - SGP
+      - KOR
+      - LKA
+      - SYR
+      - TWN
+      - TJK
+      - THA
+      - TLS
+      - TUR
+      - TKM
+      - ARE
+      - UZB
+      - VNM
+      - YEM
+
+  europe:
+    name: Europe
+    countries:
+      - ALB
+      - AND
+      - AUT
+      - BLR
+      - BEL
+      - BIH
+      - BGR
+      - HRV
+      - CYP
+      - CZE
+      - DNK
+      - EST
+      - FIN
+      - FRA
+      - DEU
+      - GRC
+      - HUN
+      - ISL
+      - IRL
+      - ITA
+      - XKX
+      - LVA
+      - LIE
+      - LTU
+      - LUX
+      - MKD
+      - MLT
+      - MDA
+      - MCO
+      - MNE
+      - NLD
+      - NOR
+      - POL
+      - PRT
+      - ROU
+      - RUS
+      - SMR
+      - SRB
+      - SVK
+      - SVN
+      - ESP
+      - SWE
+      - CHE
+      - UKR
+      - GBR
+      - VAT
+
+  americas:
+    name: Americas
+    countries:
+      - ATG
+      - ARG
+      - BHS
+      - BRB
+      - BLZ
+      - BOL
+      - BRA
+      - CAN
+      - CHL
+      - COL
+      - CRI
+      - CUB
+      - DMA
+      - DOM
+      - ECU
+      - SLV
+      - GRD
+      - GTM
+      - GUY
+      - HTI
+      - HND
+      - JAM
+      - MEX
+      - NIC
+      - PAN
+      - PRY
+      - PER
+      - KNA
+      - LCA
+      - VCT
+      - SUR
+      - TTO
+      - USA
+      - URY
+      - VEN
+
+  oceania:
+    name: Oceania
+    countries:
+      - AUS
+      - FJI
+      - KIR
+      - MHL
+      - FSM
+      - NRU
+      - NZL
+      - PLW
+      - PNG
+      - WSM
+      - SLB
+      - TON
+      - TUV
+      - VUT
+
+indicators:
+  - code: NY.GDP.MKTP.CD
+    name: GDP (current US$)
+    category: economic
+    unit: US$
+
+  - code: SP.POP.TOTL
+    name: Population
+    category: population
+    unit: people
+
+  - code: FP.CPI.TOTL.ZG
+    name: Inflation Rate
+    category: economic
+    unit: "%"
+
+  - code: NY.GDP.PCAP.CD
+    name: GDP Per Capita
+    category: economic
+    unit: US$
+
+  - code: SL.UEM.TOTL.ZS
+    name: Unemployment Rate
+    category: economic
+    unit: "%"

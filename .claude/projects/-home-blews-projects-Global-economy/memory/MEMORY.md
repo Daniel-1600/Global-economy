@@ -1,0 +1,1 @@
+- [Novice developer profile](user_novice-developer.md) — learning backend/DB, prefers line-by-line explanations
