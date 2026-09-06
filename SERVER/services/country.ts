@@ -1,5 +1,5 @@
 import axios from "axios";
-import pool from "../config/db";
+import pool from "../config/db.js";
 
  interface WorldBankCountry {
     id: string;

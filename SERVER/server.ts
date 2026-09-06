@@ -1,7 +1,6 @@
 import "dotenv/config";
 import cors from "cors";
 import express from "express";
-import pool from "./config/db.js";
 import helmet from "helmet";
 import countryRoutes from "./routes/countryRoutes.js";
 import economyRoutes from "./routes/economy.js";
@@ -16,7 +15,7 @@ const allowedOrigins = [
   "http://localhost:3000",
   "http://localhost:3001",
   process.env.FRONTEND_URL, // Production frontend URL
-].filter(Boolean);
+].filter((origin): origin is string => Boolean(origin));
 
 app.use(
   cors({
@@ -34,7 +33,7 @@ app.use(
 );
 
 // Test route
-app.get("/", (req, res) => {
+app.get("/", (_req, res) => {
   res.json({ message: "Economy API Server is running!" });
 });
 
