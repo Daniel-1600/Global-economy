@@ -4,6 +4,16 @@ import { fetchAndStoreCountries, getAllCountries } from "../services/country.js"
 
 const router = express.Router();
 
+type CollectRequestBody = {
+  countryCode?: unknown;
+};
+
+const getSingleQueryValue = (value: unknown): string | undefined =>
+  typeof value === "string" ? value : undefined;
+
+const getErrorMessage = (error: unknown): string =>
+  error instanceof Error ? error.message : "An unexpected error occurred";
+
 // POST /api/countries/store — fetch all countries from World Bank and save to DB
 router.post("/countries/store", async (req, res) => {
   try {
@@ -17,19 +27,22 @@ router.post("/countries/store", async (req, res) => {
       ...result,
     });
   } catch (error) {
-    console.error("Error storing countries:", error.message);
-    res.status(500).json({ success: false, error: error.message });
+    const message = getErrorMessage(error);
+    console.error("Error storing countries:", message);
+    res.status(500).json({ success: false, error: message });
   }
 });
 
 // GET /api/countries — get countries from the database
 router.get("/countries", async (req, res) => {
   try {
-    const { region, income_level, limit } = req.query;
+    const region = getSingleQueryValue(req.query.region);
+    const incomeLevel = getSingleQueryValue(req.query.income_level);
+    const limit = getSingleQueryValue(req.query.limit);
     const countries = await getAllCountries({
       region,
-      incomeLevel: income_level,
-      limit: limit ? parseInt(limit) : 300,
+      incomeLevel,
+      limit: limit ? Number.parseInt(limit, 10) : 300,
     });
 
     res.json({
@@ -38,17 +51,18 @@ router.get("/countries", async (req, res) => {
       data: countries,
     });
   } catch (error) {
-    console.error("Error fetching countries:", error.message);
-    res.status(500).json({ success: false, error: error.message });
+    const message = getErrorMessage(error);
+    console.error("Error fetching countries:", message);
+    res.status(500).json({ success: false, error: message });
   }
 });
 
 // POST /api/collect — fetch GDP + Population for a single country (live from API)
-router.post("/collect", async (req, res) => {
+router.post("/collect", async (req: express.Request<{}, unknown, CollectRequestBody>, res) => {
   try {
     const { countryCode } = req.body;
 
-    if (!countryCode) {
+    if (typeof countryCode !== "string" || countryCode.length === 0) {
       return res.status(400).json({ error: "countryCode is required" });
     }
 
@@ -63,7 +77,7 @@ router.post("/collect", async (req, res) => {
 
     res.json(data);
   } catch (error) {
-    console.error("Error in /collect route:", error.message);
+    console.error("Error in /collect route:", getErrorMessage(error));
     res.status(500).json({ error: "Failed to fetch country data" });
   }
 });
