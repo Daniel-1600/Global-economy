@@ -2,6 +2,56 @@ import express from "express";
 import axios from "axios";
 const router = express.Router();
 import pool from "../config/db.js";
+import config from "../config/loadconfig.js";
+
+interface WorldBankRecord {
+  countryiso3code: string;
+  country: { id: string; value: string };
+  indicator: { id: string; value: string };
+  date: string;
+  value: number | null;
+  unit: string;
+  decimal: number;
+}
+
+type WorldBankResponse = [unknown, WorldBankRecord[]];
+type RecordWithGDP = WorldBankRecord & { value: number };
+
+interface StoredEconomyRecord {
+  countryCode: string;
+  countryName: string;
+  indicatorId: string;
+  indicatorName: string;
+  year: number;
+  gdp: number;
+  unit: string;
+  decimal: number;
+}
+
+interface EconomyRecord {
+  country: { id: string; name: string };
+  countryCode: string;
+  indicator: { id: string; name: string };
+  year: number;
+  gdp: number;
+  unit: string;
+  decimal: number;
+}
+
+interface ContinentSummary {
+  continent: string;
+  continentCode: string;
+  year: number;
+  totalGDP: number;
+  averageGDP: number;
+  countryCount: number;
+  topCountry: { name: string; code: string; gdp: number };
+  gdpFormatted: { total: string; average: string; topCountry: string };
+}
+
+function getErrorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : "Unknown error";
+}
 
 // Region/Continent mapping for World Bank API
 const REGION_CODES = {
@@ -16,20 +66,23 @@ const REGION_CODES = {
 router.post("/economy/store", async (req, res) => {
   try {
     console.log("starting to fetch and store data");
-    const response = await axios.get(
+    const response = await axios.get<WorldBankResponse>(
       "https://api.worldbank.org/v2/country/all/indicator/NY.GDP.MKTP.CD?format=json&per_page=20000"
     );
 
     const rawData = response.data[1];
     if (!rawData || rawData.length === 0) {
-      res.status(400).json({ message: "no data retrieved" });
+      return res.status(400).json({ message: "no data retrieved" });
     }
 
     console.log(`fetched ${rawData.length} records from the worldbank`);
 
     //cleaning the data now
-    const structuredData = rawData
-      .filter((item) => item.value !== null && item.countryiso3code)
+    const structuredData: StoredEconomyRecord[] = rawData
+      .filter(
+        (item): item is RecordWithGDP =>
+          item.value !== null && Boolean(item.countryiso3code)
+      )
       .map((item) => ({
         countryCode: item.countryiso3code,
         countryName: item.country.value,
@@ -129,11 +182,12 @@ router.post("/economy/store", async (req, res) => {
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
-    console.error("error storing data", error.message);
+    const message = getErrorMessage(error);
+    console.error("error storing data", message);
     res.status(500).json({
       success: false,
       message: "error storing data",
-      error: error.message,
+      error: message,
     });
   }
 });
@@ -178,26 +232,24 @@ router.get("/economy/stored", async (req, res) => {
       data: result.rows,
     });
   } catch (error) {
-    console.error("Error fetching stored data:", error);
-    res.status(500).json({ error: error.message });
+    const message = getErrorMessage(error);
+    console.error("Error fetching stored data:", message);
+    res.status(500).json({ error: message });
   }
 });
 
 router.get("/economy", async (req, res) => {
   try {
     // Get region from query parameter (e.g., /api/economy?region=asia)
-    const region = req.query.region?.toLowerCase() || "global";
+    const region =
+      typeof req.query.region === "string"
+        ? req.query.region.toLowerCase()
+        : "global";
 
     // Determine which countries/regions to query
-    let regionCode = "all"; // default to all countries
+    const regionCode = "all"; // World Bank data is filtered with the YAML country lists below.
 
-    if (region !== "global" && REGION_CODES[region]) {
-      // For specific regions, we'll filter after fetching all data
-      // World Bank doesn't have perfect continent grouping, so we'll use all data and filter
-      regionCode = "all";
-    }
-
-    const response = await axios.get(
+    const response = await axios.get<WorldBankResponse>(
       `https://api.worldbank.org/v2/country/${regionCode}/indicator/NY.GDP.MKTP.CD?format=json&per_page=20000`
     );
 
@@ -212,8 +264,8 @@ router.get("/economy", async (req, res) => {
     }
 
     // Structure the data properly
-    let structuredData = rawData
-      .filter((item) => item.value !== null) // Remove null values
+    let structuredData: EconomyRecord[] = rawData
+      .filter((item): item is RecordWithGDP => item.value !== null) // Remove null values
       .map((item) => ({
         country: {
           id: item.country.id,
@@ -254,243 +306,36 @@ router.get("/economy", async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error fetching economy data:", error.message);
+    const message = getErrorMessage(error);
+    console.error("Error fetching economy data:", message);
     res.status(500).json({
       success: false,
       message: "Error fetching economy data",
-      error: error.message,
+      error: message,
     });
   }
 });
 
 // Helper function to filter by continent based on country codes
-function filterByContinent(data, continent) {
-  // Country code mappings by continent
-  const continentCountries = {
-    africa: [
-      "DZA",
-      "AGO",
-      "BEN",
-      "BWA",
-      "BFA",
-      "BDI",
-      "CMR",
-      "CPV",
-      "CAF",
-      "TCD",
-      "COM",
-      "COG",
-      "COD",
-      "CIV",
-      "DJI",
-      "EGY",
-      "GNQ",
-      "ERI",
-      "ETH",
-      "GAB",
-      "GMB",
-      "GHA",
-      "GIN",
-      "GNB",
-      "KEN",
-      "LSO",
-      "LBR",
-      "LBY",
-      "MDG",
-      "MWI",
-      "MLI",
-      "MRT",
-      "MUS",
-      "MAR",
-      "MOZ",
-      "NAM",
-      "NER",
-      "NGA",
-      "RWA",
-      "STP",
-      "SEN",
-      "SYC",
-      "SLE",
-      "SOM",
-      "ZAF",
-      "SSD",
-      "SDN",
-      "SWZ",
-      "TZA",
-      "TGO",
-      "TUN",
-      "UGA",
-      "ZMB",
-      "ZWE",
-    ],
-    asia: [
-      "AFG",
-      "ARM",
-      "AZE",
-      "BHR",
-      "BGD",
-      "BTN",
-      "BRN",
-      "KHM",
-      "CHN",
-      "GEO",
-      "HKG",
-      "IND",
-      "IDN",
-      "IRN",
-      "IRQ",
-      "ISR",
-      "JPN",
-      "JOR",
-      "KAZ",
-      "KWT",
-      "KGZ",
-      "LAO",
-      "LBN",
-      "MAC",
-      "MYS",
-      "MDV",
-      "MNG",
-      "MMR",
-      "NPL",
-      "PRK",
-      "OMN",
-      "PAK",
-      "PSE",
-      "PHL",
-      "QAT",
-      "SAU",
-      "SGP",
-      "KOR",
-      "LKA",
-      "SYR",
-      "TWN",
-      "TJK",
-      "THA",
-      "TLS",
-      "TUR",
-      "TKM",
-      "ARE",
-      "UZB",
-      "VNM",
-      "YEM",
-    ],
-    europe: [
-      "ALB",
-      "AND",
-      "AUT",
-      "BLR",
-      "BEL",
-      "BIH",
-      "BGR",
-      "HRV",
-      "CYP",
-      "CZE",
-      "DNK",
-      "EST",
-      "FIN",
-      "FRA",
-      "DEU",
-      "GRC",
-      "HUN",
-      "ISL",
-      "IRL",
-      "ITA",
-      "XKX",
-      "LVA",
-      "LIE",
-      "LTU",
-      "LUX",
-      "MKD",
-      "MLT",
-      "MDA",
-      "MCO",
-      "MNE",
-      "NLD",
-      "NOR",
-      "POL",
-      "PRT",
-      "ROU",
-      "RUS",
-      "SMR",
-      "SRB",
-      "SVK",
-      "SVN",
-      "ESP",
-      "SWE",
-      "CHE",
-      "UKR",
-      "GBR",
-      "VAT",
-    ],
-    americas: [
-      "ATG",
-      "ARG",
-      "BHS",
-      "BRB",
-      "BLZ",
-      "BOL",
-      "BRA",
-      "CAN",
-      "CHL",
-      "COL",
-      "CRI",
-      "CUB",
-      "DMA",
-      "DOM",
-      "ECU",
-      "SLV",
-      "GRD",
-      "GTM",
-      "GUY",
-      "HTI",
-      "HND",
-      "JAM",
-      "MEX",
-      "NIC",
-      "PAN",
-      "PRY",
-      "PER",
-      "KNA",
-      "LCA",
-      "VCT",
-      "SUR",
-      "TTO",
-      "USA",
-      "URY",
-      "VEN",
-    ],
-    oceania: [
-      "AUS",
-      "FJI",
-      "KIR",
-      "MHL",
-      "FSM",
-      "NRU",
-      "NZL",
-      "PLW",
-      "PNG",
-      "WSM",
-      "SLB",
-      "TON",
-      "TUV",
-      "VUT",
-    ],
-  };
+function filterByContinent(
+  data: EconomyRecord[],
+  continent: string
+): EconomyRecord[] {
+  const countryCodes = config.continents[continent.toLowerCase()]?.countries;
 
-  const targetCountries = continentCountries[continent.toLowerCase()];
-
-  if (!targetCountries) {
-    return data; // Return all if continent not found
+  if (!countryCodes) {
+    return data;
   }
 
-  return data.filter((item) => targetCountries.includes(item.countryCode));
+  return data.filter((item) => countryCodes.includes(item.countryCode));
 }
 
 // Helper function to calculate continent summaries
-function calculateContinentSummaries(data) {
-  const continents = ["africa", "asia", "europe", "americas", "oceania"];
-  const summaries = [];
+function calculateContinentSummaries(
+  data: EconomyRecord[]
+): ContinentSummary[] {
+  const continents = Object.keys(config.continents);
+  const summaries: ContinentSummary[] = [];
 
   // Get the latest year in the dataset
   const latestYear = Math.max(...data.map((item) => item.year));
@@ -520,7 +365,7 @@ function calculateContinentSummaries(data) {
       const countryCount = latestYearData.length;
 
       summaries.push({
-        continent: continent.charAt(0).toUpperCase() + continent.slice(1),
+        continent: config.continents[continent].name,
         continentCode: continent,
         year: latestYear,
         totalGDP: totalGDP,
@@ -548,217 +393,7 @@ function calculateContinentSummaries(data) {
 
 // Helper function to calculate and store continent summaries in database
 async function storeContinentSummaries() {
-  const continents = {
-    africa: [
-      "DZA",
-      "AGO",
-      "BEN",
-      "BWA",
-      "BFA",
-      "BDI",
-      "CMR",
-      "CPV",
-      "CAF",
-      "TCD",
-      "COM",
-      "COG",
-      "COD",
-      "CIV",
-      "DJI",
-      "EGY",
-      "GNQ",
-      "ERI",
-      "ETH",
-      "GAB",
-      "GMB",
-      "GHA",
-      "GIN",
-      "GNB",
-      "KEN",
-      "LSO",
-      "LBR",
-      "LBY",
-      "MDG",
-      "MWI",
-      "MLI",
-      "MRT",
-      "MUS",
-      "MAR",
-      "MOZ",
-      "NAM",
-      "NER",
-      "NGA",
-      "RWA",
-      "STP",
-      "SEN",
-      "SYC",
-      "SLE",
-      "SOM",
-      "ZAF",
-      "SSD",
-      "SDN",
-      "SWZ",
-      "TZA",
-      "TGO",
-      "TUN",
-      "UGA",
-      "ZMB",
-      "ZWE",
-    ],
-    asia: [
-      "AFG",
-      "ARM",
-      "AZE",
-      "BHR",
-      "BGD",
-      "BTN",
-      "BRN",
-      "KHM",
-      "CHN",
-      "GEO",
-      "HKG",
-      "IND",
-      "IDN",
-      "IRN",
-      "IRQ",
-      "ISR",
-      "JPN",
-      "JOR",
-      "KAZ",
-      "KWT",
-      "KGZ",
-      "LAO",
-      "LBN",
-      "MAC",
-      "MYS",
-      "MDV",
-      "MNG",
-      "MMR",
-      "NPL",
-      "PRK",
-      "OMN",
-      "PAK",
-      "PSE",
-      "PHL",
-      "QAT",
-      "SAU",
-      "SGP",
-      "KOR",
-      "LKA",
-      "SYR",
-      "TWN",
-      "TJK",
-      "THA",
-      "TLS",
-      "TUR",
-      "TKM",
-      "ARE",
-      "UZB",
-      "VNM",
-      "YEM",
-    ],
-    europe: [
-      "ALB",
-      "AND",
-      "AUT",
-      "BLR",
-      "BEL",
-      "BIH",
-      "BGR",
-      "HRV",
-      "CYP",
-      "CZE",
-      "DNK",
-      "EST",
-      "FIN",
-      "FRA",
-      "DEU",
-      "GRC",
-      "HUN",
-      "ISL",
-      "IRL",
-      "ITA",
-      "XKX",
-      "LVA",
-      "LIE",
-      "LTU",
-      "LUX",
-      "MKD",
-      "MLT",
-      "MDA",
-      "MCO",
-      "MNE",
-      "NLD",
-      "NOR",
-      "POL",
-      "PRT",
-      "ROU",
-      "RUS",
-      "SMR",
-      "SRB",
-      "SVK",
-      "SVN",
-      "ESP",
-      "SWE",
-      "CHE",
-      "UKR",
-      "GBR",
-      "VAT",
-    ],
-    americas: [
-      "ATG",
-      "ARG",
-      "BHS",
-      "BRB",
-      "BLZ",
-      "BOL",
-      "BRA",
-      "CAN",
-      "CHL",
-      "COL",
-      "CRI",
-      "CUB",
-      "DMA",
-      "DOM",
-      "ECU",
-      "SLV",
-      "GRD",
-      "GTM",
-      "GUY",
-      "HTI",
-      "HND",
-      "JAM",
-      "MEX",
-      "NIC",
-      "PAN",
-      "PRY",
-      "PER",
-      "KNA",
-      "LCA",
-      "VCT",
-      "SUR",
-      "TTO",
-      "USA",
-      "URY",
-      "VEN",
-    ],
-    oceania: [
-      "AUS",
-      "FJI",
-      "KIR",
-      "MHL",
-      "FSM",
-      "NRU",
-      "NZL",
-      "PLW",
-      "PNG",
-      "WSM",
-      "SLB",
-      "TON",
-      "TUV",
-      "VUT",
-    ],
-  };
+  const continents = config.continents;
 
   try {
     // Get latest year from database
@@ -776,7 +411,8 @@ async function storeContinentSummaries() {
     console.log(`📅 Latest year in database: ${latestYear}`);
 
     // Loop through each continent
-    for (const [continentCode, countryCodes] of Object.entries(continents)) {
+    for (const [continentCode, continent] of Object.entries(continents)) {
+      const countryCodes = continent.countries;
       // Get GDP data for all countries in this continent for the latest year
       const result = await pool.query(
         `SELECT 
@@ -833,7 +469,7 @@ async function storeContinentSummaries() {
           updated_at = NOW()`,
         [
           continentCode,
-          continentCode.charAt(0).toUpperCase() + continentCode.slice(1),
+          continent.name,
           latestYear,
           totalGDP.toString(),
           avgGDP.toString(),
@@ -853,7 +489,7 @@ async function storeContinentSummaries() {
 
     console.log("✅ Continent summaries stored successfully!");
   } catch (error) {
-    console.error("❌ Error storing continent summaries:", error.message);
+    console.error("❌ Error storing continent summaries:", getErrorMessage(error));
     throw error;
   }
 }

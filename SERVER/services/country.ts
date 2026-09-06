@@ -1,9 +1,35 @@
 import axios from "axios";
-import pool from "../config/db.js";
+import pool from "../config/db";
+
+ interface WorldBankCountry {
+    id: string;
+    name: string;
+    iso2Code: string;
+    region: {
+      value: string;
+    };
+    incomeLevel: {
+      value: string;
+    };
+    capitalCity: string;
+    longitude: string;
+    latitude: string;
+  }
+
+  interface CountryFilters {
+    region?: string;
+    incomeLevel?: string;
+    limit?: number;
+  }
+
+  interface StoreCountriesResult {
+    stored: number;
+    skipped: number;
+  }
 
 // Fetch all countries from World Bank API and store them in the database
-export const fetchAndStoreCountries = async () => {
-  const response = await axios.get(
+export const fetchAndStoreCountries = async ():Promise<StoreCountriesResult> => {
+  const response = await axios.get<[unknown, WorldBankCountry[]]>(
     "https://api.worldbank.org/v2/country/all?format=json&per_page=300"
   );
 
@@ -70,7 +96,7 @@ export const fetchAndStoreCountries = async () => {
 };
 
 // Get all countries from the database
-export const getAllCountries = async ({ region, incomeLevel, limit = 300 } = {}) => {
+export const getAllCountries = async ({ region, incomeLevel, limit = 300 }:CountryFilters = {}) => {
   let query = "SELECT * FROM countries WHERE 1=1";
   const params = [];
 
