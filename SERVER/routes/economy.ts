@@ -240,53 +240,73 @@ router.get("/economy/stored", async (req, res) => {
 
 router.get("/economy", async (req, res) => {
   try {
-    // Get region from query parameter (e.g., /api/economy?region=asia)
+    // Read the website data from PostgreSQL. The World Bank API is only used by
+    // POST /api/economy/store to refresh the local database.
     const region =
       typeof req.query.region === "string"
         ? req.query.region.toLowerCase()
         : "global";
 
-    // Determine which countries/regions to query
-    const regionCode = "all"; // World Bank data is filtered with the YAML country lists below.
+    const countryCodes =
+      region === "global" ? undefined : config.continents[region]?.countries;
 
-    const response = await axios.get<WorldBankResponse>(
-      `https://api.worldbank.org/v2/country/${regionCode}/indicator/NY.GDP.MKTP.CD?format=json&per_page=20000`
-    );
-
-    // World Bank API returns [metadata, data]
-    const rawData = response.data[1];
-
-    if (!rawData || rawData.length === 0) {
-      return res.status(404).json({
+    if (region !== "global" && !countryCodes) {
+      return res.status(400).json({
         success: false,
-        message: "No data available",
+        message: `Unknown region: ${region}`,
+        availableRegions: ["global", ...Object.keys(config.continents)],
       });
     }
 
-    // Structure the data properly
-    let structuredData: EconomyRecord[] = rawData
-      .filter((item): item is RecordWithGDP => item.value !== null) // Remove null values
-      .map((item) => ({
-        country: {
-          id: item.country.id,
-          name: item.country.value,
-        },
-        countryCode: item.countryiso3code,
-        indicator: {
-          id: item.indicator.id,
-          name: item.indicator.value,
-        },
-        year: parseInt(item.date),
-        gdp: item.value,
-        unit: item.unit || "Current US$",
-        decimal: item.decimal || 0,
-      }))
-      .sort((a, b) => b.year - a.year); // Sort by most recent year first
+    const params: string[][] = [];
+    let whereClause = "";
 
-    // Filter by continent if specified
-    if (region !== "global") {
-      structuredData = filterByContinent(structuredData, region);
+    if (countryCodes) {
+      params.push(countryCodes);
+      whereClause = "WHERE g.country_code = ANY($1::text[])";
     }
+
+    const result = await pool.query(
+      `SELECT
+         g.country_code,
+         c.country_name,
+         g.indicator_id,
+         g.indicator_name,
+         g.year,
+         g.gdp,
+         g.unit,
+         g.decimal_places,
+         MAX(g.updated_at) OVER () AS last_updated
+       FROM gdp_data g
+       INNER JOIN countries c ON c.country_code = g.country_code
+       ${whereClause}
+       ORDER BY g.year DESC, g.gdp DESC`,
+      params
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message:
+          "No stored economy data is available. Run POST /api/economy/store once to populate the database.",
+      });
+    }
+
+    const structuredData: EconomyRecord[] = result.rows.map((row) => ({
+        country: {
+          id: row.country_code,
+          name: row.country_name,
+        },
+        countryCode: row.country_code,
+        indicator: {
+          id: row.indicator_id,
+          name: row.indicator_name,
+        },
+        year: Number(row.year),
+        gdp: Number(row.gdp),
+        unit: row.unit || "Current US$",
+        decimal: row.decimal_places || 0,
+      }));
 
     // Calculate continent summaries
     const continentSummaries = calculateContinentSummaries(structuredData);
@@ -300,9 +320,9 @@ router.get("/economy", async (req, res) => {
       data: structuredData,
       metadata: {
         indicator: "GDP (Current US$)",
-        source: "World Bank API",
-        lastUpdated: new Date().toISOString(),
-        availableRegions: Object.keys(REGION_CODES),
+        source: "PostgreSQL database",
+        lastUpdated: result.rows[0].last_updated,
+        availableRegions: ["global", ...Object.keys(config.continents)],
       },
     });
   } catch (error) {
