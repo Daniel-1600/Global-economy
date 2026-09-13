@@ -1,293 +1,67 @@
 "use client";
-import { useState } from "react";
-import { signIn } from "next-auth/react";
+
 import { motion } from "framer-motion";
+import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { useState } from "react";
 
 export default function LoginPage() {
   const router = useRouter();
-  const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const handleEmailLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
     setError("");
     setLoading(true);
-
-    if (!isLogin && password !== confirmPassword) {
-      setError("Passwords do not match");
-      setLoading(false);
-      return;
-    }
-
-    if (password.length < 6) {
-      setError("Password must be at least 6 characters");
-      setLoading(false);
-      return;
-    }
-
     try {
-      const result = await signIn("credentials", {
-        email,
-        password,
-        redirect: false,
-      });
-
-      if (result?.error) {
-        setError("Invalid email or password");
-      } else {
-        router.push("/dashboard");
-      }
+      const result = await signIn("credentials", { email, password, redirect: false });
+      if (result?.error) setError("The email or password is incorrect.");
+      else router.push("/dashboard");
     } catch {
-      setError("An error occurred. Please try again.");
+      setError("We could not sign you in. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleGoogleLogin = () => {
-    signIn("google", { callbackUrl: "/dashboard" });
-  };
-
   return (
-    <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-6">
-      {/* Background effects */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl" />
-      </div>
-
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="relative z-10 w-full max-w-md"
-      >
-        {/* Logo / Brand */}
-        <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center gap-2">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-700 rounded-xl flex items-center justify-center">
-              <svg
-                className="w-6 h-6 text-white"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <path d="M12 2L2 7l10 5 10-5-10-5z" />
-                <path d="M2 17l10 5 10-5M2 12l10 5 10-5" />
-              </svg>
-            </div>
-            <span className="text-xl font-bold text-white">
-              Economy Explorer
-            </span>
-          </Link>
-          <p className="text-gray-400 mt-4">
-            {isLogin
-              ? "Welcome back! Sign in to continue."
-              : "Create your account to get started."}
-          </p>
-        </div>
-
-        {/* Login Card */}
-        <div className="bg-[#12121f] border border-gray-800/50 rounded-2xl p-8">
-          {/* Toggle Login/Register */}
-          <div className="flex mb-6 bg-[#0a0a1a] rounded-lg p-1">
-            <button
-              onClick={() => setIsLogin(true)}
-              className={`flex-1 py-2 rounded-md text-sm font-medium transition-all ${
-                isLogin
-                  ? "bg-blue-600 text-white"
-                  : "text-gray-400 hover:text-white"
-              }`}
-            >
-              Sign In
-            </button>
-            <button
-              onClick={() => setIsLogin(false)}
-              className={`flex-1 py-2 rounded-md text-sm font-medium transition-all ${
-                !isLogin
-                  ? "bg-blue-600 text-white"
-                  : "text-gray-400 hover:text-white"
-              }`}
-            >
-              Sign Up
-            </button>
+    <main className="relative min-h-screen overflow-hidden bg-[#070b14] px-5 py-10 sm:px-8">
+      <div className="absolute inset-0 bg-grid-pattern opacity-20" />
+      <div className="absolute -right-32 top-24 h-96 w-96 rounded-full bg-cyan-400/10 blur-[120px]" />
+      <div className="relative mx-auto grid min-h-[calc(100vh-5rem)] max-w-6xl items-center gap-14 lg:grid-cols-2">
+        <section className="hidden lg:block">
+          <Link href="/" className="inline-flex items-center gap-3 text-sm font-semibold text-white"><span className="grid h-10 w-10 place-items-center rounded-2xl border border-cyan-300/20 bg-blue-500/10 text-xs text-cyan-200">GE</span>Global Economy</Link>
+          <p className="mt-20 text-xs font-semibold uppercase tracking-[.22em] text-blue-400">Welcome back</p>
+          <h1 className="mt-5 max-w-lg text-5xl font-semibold leading-[1.05] tracking-tight text-white">Your view of the world economy, ready when you are.</h1>
+          <div className="mt-10 grid max-w-lg grid-cols-3 gap-3">
+            {["Country rankings", "Historical trends", "Regional context"].map((item, index) => <div key={item} className="rounded-2xl border border-white/[0.07] bg-white/[0.025] p-4"><span className="text-xs text-cyan-300">0{index + 1}</span><p className="mt-8 text-sm leading-5 text-slate-400">{item}</p></div>)}
           </div>
+        </section>
 
-          {/* Google Login Button */}
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={handleGoogleLogin}
-            className="w-full flex items-center justify-center gap-3 bg-white hover:bg-gray-100 text-gray-800 font-medium py-3 rounded-xl transition-all mb-6"
-          >
-            <svg className="w-5 h-5" viewBox="0 0 24 24">
-              <path
-                fill="#4285F4"
-                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-              />
-              <path
-                fill="#34A853"
-                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-              />
-              <path
-                fill="#FBBC05"
-                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-              />
-              <path
-                fill="#EA4335"
-                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-              />
-            </svg>
+        <motion.section initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} className="mx-auto w-full max-w-md rounded-[2rem] border border-white/[0.08] bg-[#0d1320]/90 p-6 shadow-2xl shadow-black/40 backdrop-blur sm:p-8">
+          <Link href="/" className="mb-8 flex items-center gap-3 text-sm font-semibold text-white lg:hidden"><span className="grid h-9 w-9 place-items-center rounded-xl bg-blue-500/15 text-xs text-cyan-200">GE</span>Global Economy</Link>
+          <h2 className="text-2xl font-semibold text-white">Sign in</h2>
+          <p className="mt-2 text-sm text-slate-500">Continue to your economic intelligence workspace.</p>
+
+          <button onClick={() => signIn("google", { callbackUrl: "/dashboard" })} className="mt-8 flex w-full items-center justify-center gap-3 rounded-xl border border-white/[0.09] bg-white py-3.5 text-sm font-semibold text-slate-900 hover:bg-slate-100">
+            <svg className="h-5 w-5" viewBox="0 0 24 24"><path fill="#4285F4" d="M21.6 12.2c0-.7-.1-1.4-.2-2.1H12v4h5.4a4.7 4.7 0 01-2 3v2.6h3.3c1.9-1.8 2.9-4.4 2.9-7.5Z"/><path fill="#34A853" d="M12 22c2.7 0 5-.9 6.7-2.4l-3.3-2.6c-.9.6-2.1 1-3.4 1a5.9 5.9 0 01-5.5-4.1H3.1v2.7A10 10 0 0012 22Z"/><path fill="#FBBC05" d="M6.5 13.9A6 6 0 016.2 12c0-.7.1-1.3.3-1.9V7.4H3.1A10 10 0 002 12c0 1.7.4 3.2 1.1 4.6l3.4-2.7Z"/><path fill="#EA4335" d="M12 6c1.5 0 2.8.5 3.8 1.5l2.9-2.9A9.7 9.7 0 0012 2a10 10 0 00-8.9 5.4l3.4 2.7A5.9 5.9 0 0112 6Z"/></svg>
             Continue with Google
-          </motion.button>
+          </button>
+          <div className="my-6 flex items-center gap-4"><span className="h-px flex-1 bg-white/[0.07]"/><span className="text-[11px] uppercase tracking-wider text-slate-600">or email</span><span className="h-px flex-1 bg-white/[0.07]"/></div>
 
-          {/* Divider */}
-          <div className="flex items-center gap-4 mb-6">
-            <div className="flex-1 h-px bg-gray-700" />
-            <span className="text-gray-500 text-sm">or</span>
-            <div className="flex-1 h-px bg-gray-700" />
-          </div>
-
-          {/* Email Form */}
-          <form onSubmit={handleEmailLogin}>
-            {error && (
-              <div className="mb-4 p-3 bg-red-500/10 border border-red-500/50 rounded-lg text-red-400 text-sm">
-                {error}
-              </div>
-            )}
-
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Email Address
-                </label>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@example.com"
-                  className="w-full px-4 py-3 bg-[#0a0a1a] border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 transition-colors"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Password
-                </label>
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="w-full px-4 py-3 bg-[#0a0a1a] border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 transition-colors"
-                  required
-                />
-              </div>
-
-              {!isLogin && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Confirm Password
-                  </label>
-                  <input
-                    type="password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="••••••••"
-                    className="w-full px-4 py-3 bg-[#0a0a1a] border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 transition-colors"
-                    required
-                  />
-                </div>
-              )}
-
-              {isLogin && (
-                <div className="flex justify-end">
-                  <button
-                    type="button"
-                    className="text-sm text-blue-400 hover:text-blue-300 transition-colors"
-                  >
-                    Forgot password?
-                  </button>
-                </div>
-              )}
-            </div>
-
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              type="submit"
-              disabled={loading}
-              className="w-full mt-6 bg-blue-600 hover:bg-blue-500 disabled:bg-blue-600/50 text-white font-medium py-3 rounded-xl transition-all flex items-center justify-center gap-2"
-            >
-              {loading ? (
-                <svg
-                  className="animate-spin h-5 w-5"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  />
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  />
-                </svg>
-              ) : isLogin ? (
-                "Sign In"
-              ) : (
-                "Create Account"
-              )}
-            </motion.button>
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {error && <p className="rounded-xl border border-red-400/15 bg-red-400/[0.06] p-3 text-sm text-red-300">{error}</p>}
+            <label className="block text-sm text-slate-300"><span className="mb-2 block">Email address</span><input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" required className="w-full rounded-xl border border-white/[0.08] bg-[#090e18] px-4 py-3.5 text-white outline-none placeholder:text-slate-700 focus:border-blue-400/50 focus:ring-4 focus:ring-blue-500/10" /></label>
+            <label className="block text-sm text-slate-300"><span className="mb-2 flex justify-between">Password <button type="button" className="text-xs text-slate-500 hover:text-cyan-300">Forgot password?</button></span><input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Your password" required minLength={6} className="w-full rounded-xl border border-white/[0.08] bg-[#090e18] px-4 py-3.5 text-white outline-none placeholder:text-slate-700 focus:border-blue-400/50 focus:ring-4 focus:ring-blue-500/10" /></label>
+            <button type="submit" disabled={loading} className="w-full rounded-xl bg-blue-500 py-3.5 text-sm font-semibold text-white hover:bg-blue-400 disabled:cursor-wait disabled:opacity-60">{loading ? "Signing in…" : "Sign in"}</button>
           </form>
-
-          {/* Terms */}
-          {!isLogin && (
-            <p className="text-xs text-gray-500 text-center mt-4">
-              By creating an account, you agree to our{" "}
-              <a href="#" className="text-blue-400 hover:underline">
-                Terms of Service
-              </a>{" "}
-              and{" "}
-              <a href="#" className="text-blue-400 hover:underline">
-                Privacy Policy
-              </a>
-            </p>
-          )}
-        </div>
-
-        {/* Back to home */}
-        <div className="text-center mt-6">
-          <Link
-            href="/"
-            className="text-gray-400 hover:text-white transition-colors text-sm flex items-center justify-center gap-2"
-          >
-            <svg
-              className="w-4 h-4"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <path d="M19 12H5M12 19l-7-7 7-7" />
-            </svg>
-            Back to Home
-          </Link>
-        </div>
-      </motion.div>
-    </div>
+          <p className="mt-6 text-center text-sm text-slate-500">New to Global Economy? <Link href="/register" className="font-medium text-cyan-300 hover:text-cyan-200">Create an account</Link></p>
+        </motion.section>
+      </div>
+    </main>
   );
 }

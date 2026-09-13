@@ -1,100 +1,26 @@
-import Hero from "@/components/Hero";
-import Navbar from "@/components/Navbar";
 import Footer from "@/components/footer";
+import Hero from "@/components/Hero";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { useEffect } from "react";
 
 export default function Home() {
-  useEffect(() => {
-    // Scroll to top on page load
-    window.scrollTo(0, 0);
-  }, []);
-
   return (
     <>
-      <Navbar />
       <Hero />
-
-      {/* Call to Action Section */}
-      <section className="relative bg-black py-24 px-4">
-        <div className="max-w-4xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="relative bg-gradient-to-br from-blue-600/20 to-blue-900/20 border border-blue-500/30 rounded-3xl p-12 overflow-hidden"
-          >
-            {/* Background decoration */}
-            <div className="absolute inset-0 bg-grid-pattern opacity-5" />
-            <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500 rounded-full blur-3xl opacity-10" />
-            <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-400 rounded-full blur-3xl opacity-10" />
-
-            <div className="relative z-10 text-center">
-              <motion.h2
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: 0.1 }}
-                className="text-3xl md:text-5xl font-bold text-white mb-4"
-              >
-                Ready to Get Started?
-              </motion.h2>
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-                className="text-gray-300 text-lg mb-8 max-w-2xl mx-auto"
-              >
-                Join thousands of users who are already making data-driven
-                decisions with Economy Explorer. Start your free trial today!
-              </motion.p>
-
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: 0.3 }}
-                className="flex flex-col sm:flex-row gap-4 justify-center"
-              >
-                <Link href="/dashboard">
-                  <motion.button
-                    whileHover={{
-                      scale: 1.05,
-                      boxShadow: "0 0 30px rgba(59, 130, 246, 0.5)",
-                    }}
-                    whileTap={{ scale: 0.95 }}
-                    className="px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition-all flex items-center justify-center gap-2"
-                  >
-                    Get Started Free
-                    <svg
-                      className="w-5 h-5"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                    >
-                      <path d="M5 12h14M12 5l7 7-7 7" />
-                    </svg>
-                  </motion.button>
-                </Link>
-                <Link href="/countries">
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="px-8 py-4 bg-white/10 hover:bg-white/20 text-white font-bold rounded-xl border border-blue-500/30 backdrop-blur-sm transition-all"
-                  >
-                    Explore Data
-                  </motion.button>
-                </Link>
-              </motion.div>
+      <section className="bg-[#070b14] px-5 pb-24 sm:px-8 sm:pb-32">
+        <motion.div initial={{ opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="relative mx-auto max-w-7xl overflow-hidden rounded-[2rem] border border-blue-400/15 bg-gradient-to-br from-blue-500/15 via-[#10182a] to-cyan-300/[0.06] px-6 py-14 text-center sm:px-12 sm:py-20">
+          <div className="absolute left-1/2 top-0 h-48 w-96 -translate-x-1/2 rounded-full bg-blue-400/15 blur-3xl" />
+          <div className="relative">
+            <p className="text-xs font-semibold uppercase tracking-[.22em] text-cyan-300">Start exploring</p>
+            <h2 className="mx-auto mt-4 max-w-2xl text-3xl font-semibold tracking-tight text-white sm:text-5xl">A clearer view of the global economy is one click away.</h2>
+            <p className="mx-auto mt-5 max-w-xl text-sm leading-7 text-slate-400 sm:text-base">Open the dashboard for the big picture, or go straight to country-level data.</p>
+            <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+              <Link href="/dashboard" className="rounded-full bg-white px-6 py-3.5 text-sm font-semibold text-slate-950 hover:bg-cyan-100">Open dashboard</Link>
+              <Link href="/countries" className="rounded-full border border-white/10 bg-white/[0.04] px-6 py-3.5 text-sm font-medium text-white hover:bg-white/[0.08]">Explore countries</Link>
             </div>
-          </motion.div>
-        </div>
+          </div>
+        </motion.div>
       </section>
-
       <Footer />
     </>
   );

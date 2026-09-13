@@ -17,6 +17,7 @@ export default function App({
     "/countries",
     "/settings",
     "/login",
+    "/register",
   ];
   const hideGlobalNavbar = pagesWithCustomLayout.includes(router.pathname);
 
