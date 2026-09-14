@@ -83,6 +83,26 @@ CRON_TZ=Africa/Nairobi
 The backend must be running on port 5000 at the scheduled time. Override the URL
 with `ECONOMY_REFRESH_URL` if it is hosted elsewhere.
 
+## Deploying on Render
+
+The root-level `render.yaml` Blueprint provisions:
+
+- the Next.js web service;
+- the Express API service;
+- a PostgreSQL 18 database;
+- a daily refresh cron job at 23:00 UTC (02:00 Africa/Nairobi).
+
+Push the repository to GitHub, GitLab, or Bitbucket, then create a new Blueprint
+in Render and select this repository. During the first sync, provide
+`GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`. Render generates the NextAuth and
+refresh secrets, connects the services, and runs the SQL migrations when the API
+starts.
+
+After the first deployment, manually trigger `global-economy-daily-refresh` once
+from its **Runs** page to populate the new database immediately. Render cron jobs
+have a minimum monthly charge; remove the cron service from the Blueprint if you
+want to schedule refreshes elsewhere.
+
 - GET /api/economy
   - Returns structured data and metadata. Supports query param `region` (e.g., `?region=asia`) to filter by continent/region.
 
@@ -94,4 +114,3 @@ with `ECONOMY_REFRESH_URL` if it is hosted elsewhere.
 - Frontend fetches API at `http://localhost:5000/api/economy` in the dashboard code; ensure the server runs on port 5000 or update the frontend fetch URL.
 - The app infers continent groupings and computes continent summaries for the latest year in the dataset.
 - Some placeholder UI elements (AI insights text, hero CTA, subscription form) are present and may be wired to backend/email services in the future.
-

@@ -12,11 +12,17 @@ if ! flock -n 9; then
 fi
 
 printf '[%s] Starting economy database refresh.\n' "$(date --iso-8601=seconds)"
-curl \
-  --fail-with-body \
-  --silent \
-  --show-error \
-  --max-time 1800 \
-  -X POST \
-  "$refresh_url"
+curl_args=(
+  --fail-with-body
+  --silent
+  --show-error
+  --max-time 1800
+  -X POST
+)
+
+if [[ -n "${ECONOMY_REFRESH_TOKEN:-}" ]]; then
+  curl_args+=(-H "Authorization: Bearer ${ECONOMY_REFRESH_TOKEN}")
+fi
+
+curl "${curl_args[@]}" "$refresh_url"
 printf '\n[%s] Economy database refresh completed.\n' "$(date --iso-8601=seconds)"

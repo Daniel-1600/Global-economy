@@ -74,6 +74,17 @@ const REGION_CODES = {
 };
 
 router.post("/economy/store", async (req, res) => {
+  const refreshToken = process.env.ECONOMY_REFRESH_TOKEN;
+  if (
+    refreshToken &&
+    req.get("authorization") !== `Bearer ${refreshToken}`
+  ) {
+    return res.status(401).json({
+      success: false,
+      message: "A valid refresh token is required",
+    });
+  }
+
   try {
     console.log("starting to fetch and store data");
     const [gdpResponse, populationResponse] = await Promise.all([
