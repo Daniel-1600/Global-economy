@@ -54,27 +54,27 @@ services:
       - key: GOOGLE_CLIENT_SECRET
         sync: false
 
-  - type: cron
-    name: global-economy-daily-refresh
-    runtime: node
-    plan: 0.5c-512mb
-    region: frankfurt
-    rootDir: SERVER
-    schedule: "0 23 * * *"
-    buildCommand: chmod +x scripts/refresh-economy.sh
-    startCommand: ECONOMY_REFRESH_URL="${ECONOMY_API_URL}/api/economy/store" ./scripts/refresh-economy.sh
-    autoDeployTrigger: commit
-    envVars:
-      - key: ECONOMY_API_URL
-        fromService:
-          type: web
-          name: global-economy-api
-          envVarKey: RENDER_EXTERNAL_URL
-      - key: ECONOMY_REFRESH_TOKEN
-        fromService:
-          type: web
-          name: global-economy-api
-          envVarKey: ECONOMY_REFRESH_TOKEN
+  # - type: cron
+  #   name: global-economy-daily-refresh
+  #   runtime: node
+  #   plan: 0.5c-512mb
+  #   region: frankfurt
+  #   rootDir: SERVER
+  #   schedule: "0 23 * * *"
+  #   buildCommand: chmod +x scripts/refresh-economy.sh
+  #   startCommand: ECONOMY_REFRESH_URL="${ECONOMY_API_URL}/api/economy/store" ./scripts/refresh-economy.sh
+  #   autoDeployTrigger: commit
+  #   envVars:
+  #     - key: ECONOMY_API_URL
+  #       fromService:
+  #         type: web
+  #         name: global-economy-api
+  #         envVarKey: RENDER_EXTERNAL_URL
+  #     - key: ECONOMY_REFRESH_TOKEN
+  #       fromService:
+  #         type: web
+  #         name: global-economy-api
+  #         envVarKey: ECONOMY_REFRESH_TOKEN
 
 databases:
   - name: global-economy-db
