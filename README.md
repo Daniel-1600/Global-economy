@@ -69,6 +69,20 @@ Global economic data and AI-powered insights — an interactive web dashboard th
 - POST /api/collect
   - Returns stored GDP and population history for one three-letter country code; it does not call the World Bank API.
 
+## Daily data refresh
+
+`SERVER/scripts/refresh-economy.sh` calls the refresh endpoint, prevents overlapping
+imports, fails on HTTP errors, and allows up to 30 minutes for an import. A typical
+Fedora cron entry that runs it every day at 02:00 Africa/Nairobi time is:
+
+```cron
+CRON_TZ=Africa/Nairobi
+0 2 * * * /home/blews/projects/Global-economy/SERVER/scripts/refresh-economy.sh >> /home/blews/projects/Global-economy/SERVER/logs/economy-refresh.log 2>&1
+```
+
+The backend must be running on port 5000 at the scheduled time. Override the URL
+with `ECONOMY_REFRESH_URL` if it is hosted elsewhere.
+
 - GET /api/economy
   - Returns structured data and metadata. Supports query param `region` (e.g., `?region=asia`) to filter by continent/region.
 
@@ -80,5 +94,4 @@ Global economic data and AI-powered insights — an interactive web dashboard th
 - Frontend fetches API at `http://localhost:5000/api/economy` in the dashboard code; ensure the server runs on port 5000 or update the frontend fetch URL.
 - The app infers continent groupings and computes continent summaries for the latest year in the dataset.
 - Some placeholder UI elements (AI insights text, hero CTA, subscription form) are present and may be wired to backend/email services in the future.
-
 
