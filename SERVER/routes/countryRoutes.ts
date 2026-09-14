@@ -57,7 +57,7 @@ router.get("/countries", async (req, res) => {
   }
 });
 
-// POST /api/collect — fetch GDP + Population for a single country (live from API)
+// POST /api/collect — read stored GDP + population for a single country
 router.post("/collect", async (req: express.Request<{}, unknown, CollectRequestBody>, res) => {
   try {
     const { countryCode } = req.body;
@@ -71,14 +71,14 @@ router.post("/collect", async (req: express.Request<{}, unknown, CollectRequestB
     if (!data || !data.gdpData || !data.popData) {
       return res.status(404).json({
         error:
-          "No data found for this country code. Please use a valid 3-letter code (e.g., USA, IND, CHN)",
+          "No stored data found for this country code. Refresh the database and use a valid 3-letter code (e.g., USA, IND, CHN)",
       });
     }
 
     res.json(data);
   } catch (error) {
     console.error("Error in /collect route:", getErrorMessage(error));
-    res.status(500).json({ error: "Failed to fetch country data" });
+    res.status(500).json({ error: "Failed to load stored country data" });
   }
 });
 

@@ -28,6 +28,16 @@ interface StoredEconomyRecord {
   decimal: number;
 }
 
+interface StoredPopulationRecord {
+  countryCode: string;
+  year: number;
+  population: number;
+  indicatorId: string;
+  indicatorName: string;
+  unit: string;
+  decimal: number;
+}
+
 interface EconomyRecord {
   country: { id: string; name: string };
   countryCode: string;
@@ -66,16 +76,29 @@ const REGION_CODES = {
 router.post("/economy/store", async (req, res) => {
   try {
     console.log("starting to fetch and store data");
-    const response = await axios.get<WorldBankResponse>(
-      "https://api.worldbank.org/v2/country/all/indicator/NY.GDP.MKTP.CD?format=json&per_page=20000"
-    );
+    const [gdpResponse, populationResponse] = await Promise.all([
+      axios.get<WorldBankResponse>(
+        "https://api.worldbank.org/v2/country/all/indicator/NY.GDP.MKTP.CD?format=json&per_page=20000"
+      ),
+      axios.get<WorldBankResponse>(
+        "https://api.worldbank.org/v2/country/all/indicator/SP.POP.TOTL?format=json&per_page=20000"
+      ),
+    ]);
 
-    const rawData = response.data[1];
-    if (!rawData || rawData.length === 0) {
+    const rawData = gdpResponse.data[1];
+    const rawPopulationData = populationResponse.data[1];
+    if (
+      !rawData ||
+      rawData.length === 0 ||
+      !rawPopulationData ||
+      rawPopulationData.length === 0
+    ) {
       return res.status(400).json({ message: "no data retrieved" });
     }
 
-    console.log(`fetched ${rawData.length} records from the worldbank`);
+    console.log(
+      `fetched ${rawData.length} GDP and ${rawPopulationData.length} population records from the worldbank`
+    );
 
     //cleaning the data now
     const structuredData: StoredEconomyRecord[] = rawData
@@ -94,17 +117,43 @@ router.post("/economy/store", async (req, res) => {
         decimal: item.decimal || 0,
       }));
 
-    console.log(`cleaned data : ${structuredData.length} valid records `);
+    const structuredPopulationData: StoredPopulationRecord[] =
+      rawPopulationData
+        .filter(
+          (item): item is RecordWithGDP =>
+            item.value !== null && Boolean(item.countryiso3code)
+        )
+        .map((item) => ({
+          countryCode: item.countryiso3code,
+          year: parseInt(item.date),
+          population: Math.round(item.value),
+          indicatorId: item.indicator.id,
+          indicatorName: item.indicator.value,
+          unit: item.unit || "People",
+          decimal: item.decimal || 0,
+        }));
+
+    console.log(
+      `cleaned data: ${structuredData.length} GDP and ${structuredPopulationData.length} population records`
+    );
+
+    const countries = new Map<string, string>();
+    for (const item of [...rawData, ...rawPopulationData]) {
+      if (item.countryiso3code) {
+        countries.set(item.countryiso3code, item.country.value);
+      }
+    }
 
     //storing in the database
     const client = await pool.connect();
     let countriesInserted = 0;
     let gdpRecordsInserted = 0;
+    let populationRecordsInserted = 0;
 
     try {
       await client.query("BEGIN");
 
-      for (const record of structuredData) {
+      for (const [countryCode, countryName] of countries) {
         await client.query(
           `INSERT INTO countries (country_code, country_name)
            VALUES ($1, $2)
@@ -112,13 +161,13 @@ router.post("/economy/store", async (req, res) => {
            DO UPDATE SET 
              country_name = EXCLUDED.country_name,
              updated_at = NOW()`,
-          [record.countryCode, record.countryName]
+          [countryCode, countryName]
         );
         countriesInserted++;
 
         if (countriesInserted % 50 === 0) {
           console.log(
-            `📊 Countries: ${countriesInserted}/${structuredData.length}`
+            `📊 Countries: ${countriesInserted}/${countries.size}`
           );
         }
       }
@@ -159,6 +208,41 @@ router.post("/economy/store", async (req, res) => {
         }
       }
 
+      for (const record of structuredPopulationData) {
+        await client.query(
+          `INSERT INTO population_data (
+            country_code, year, population,
+            indicator_id, indicator_name,
+            unit, decimal_places
+          )
+          VALUES ($1, $2, $3, $4, $5, $6, $7)
+          ON CONFLICT (country_code, year)
+          DO UPDATE SET
+            population = EXCLUDED.population,
+            indicator_id = EXCLUDED.indicator_id,
+            indicator_name = EXCLUDED.indicator_name,
+            unit = EXCLUDED.unit,
+            decimal_places = EXCLUDED.decimal_places,
+            updated_at = NOW()`,
+          [
+            record.countryCode,
+            record.year,
+            record.population,
+            record.indicatorId,
+            record.indicatorName,
+            record.unit,
+            record.decimal,
+          ]
+        );
+        populationRecordsInserted++;
+
+        if (populationRecordsInserted % 100 === 0) {
+          console.log(
+            `Population Records: ${populationRecordsInserted}/${structuredPopulationData.length}`
+          );
+        }
+      }
+
       await client.query("COMMIT");
       console.log("✅ All data committed to database!");
     } catch (error) {
@@ -177,7 +261,8 @@ router.post("/economy/store", async (req, res) => {
       stored: {
         countries: countriesInserted,
         gdpRecords: gdpRecordsInserted,
-        totalRecords: structuredData.length,
+        populationRecords: populationRecordsInserted,
+        totalRecords: structuredData.length + structuredPopulationData.length,
       },
       timestamp: new Date().toISOString(),
     });
@@ -212,6 +297,14 @@ router.get("/economy/stored", async (req, res) => {
         FROM gdp_data g
         LEFT JOIN countries c ON g.country_code = c.country_code
         ORDER BY g.year DESC, g.gdp DESC
+        LIMIT $1
+      `;
+    } else if (table === "population_data") {
+      query = `
+        SELECT p.*, c.country_name
+        FROM population_data p
+        LEFT JOIN countries c ON p.country_code = c.country_code
+        ORDER BY p.year DESC, p.population DESC
         LIMIT $1
       `;
     } else if (table === "continent_summaries") {

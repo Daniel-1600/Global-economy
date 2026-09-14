@@ -1,12 +1,12 @@
 
 # Global Economy (Economy Explorer)
 
-Real-time global economic data and AI-powered insights — an interactive web dashboard that fetches World Bank GDP data, stores it, and visualizes country and continent-level summaries.
+Global economic data and AI-powered insights — an interactive web dashboard that imports World Bank GDP and population data into PostgreSQL and serves stored data to the UI.
 
 ## Features
 
 - Real-time World Bank data ingestion
-  - Backend endpoint to fetch and persist World Bank GDP data (POST /api/economy/store).
+  - Backend endpoint to fetch and persist World Bank GDP and population data (POST /api/economy/store).
   - Cleans and normalizes World Bank responses (filters nulls, parses years, rounds values).
 
 - REST API
@@ -31,7 +31,7 @@ Real-time global economic data and AI-powered insights — an interactive web da
 
 - Frontend: React + TypeScript (.tsx), Tailwind CSS, Framer Motion
 - Backend: Express.js, Axios
-- Data: World Bank API, PostgreSQL
+- Data: PostgreSQL, refreshed on demand from the World Bank API
 
 ## Quick start (inferred)
 
@@ -47,6 +47,7 @@ Real-time global economic data and AI-powered insights — an interactive web da
 
 3. Configure environment:
    - Create a .env (or configure environment vars) for PostgreSQL connection string and any other server envs. The server code references a DB pool in SERVER/config/db.js — set DATABASE_URL or the variables used there.
+   - Apply the SQL files in `SERVER/migrations` in numeric order.
 
 4. Run the server:
    - Example (adjust to your scripts):
@@ -63,7 +64,10 @@ Real-time global economic data and AI-powered insights — an interactive web da
 ## API notes (inferred)
 
 - POST /api/economy/store
-  - Fetches data from the World Bank API and stores cleaned records in the database.
+  - Fetches GDP and population data from the World Bank API and stores cleaned records in the database. This is the only refresh operation used by the country data explorer.
+
+- POST /api/collect
+  - Returns stored GDP and population history for one three-letter country code; it does not call the World Bank API.
 
 - GET /api/economy
   - Returns structured data and metadata. Supports query param `region` (e.g., `?region=asia`) to filter by continent/region.
@@ -76,6 +80,5 @@ Real-time global economic data and AI-powered insights — an interactive web da
 - Frontend fetches API at `http://localhost:5000/api/economy` in the dashboard code; ensure the server runs on port 5000 or update the frontend fetch URL.
 - The app infers continent groupings and computes continent summaries for the latest year in the dataset.
 - Some placeholder UI elements (AI insights text, hero CTA, subscription form) are present and may be wired to backend/email services in the future.
-
 
 
